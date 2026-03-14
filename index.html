@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SKR Ultimate Calculator Final</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <style>
+        /* --- [V101 SECURITY STYLES - BOLD] --- */
+        #licenseOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #001f3f; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #FFD700; text-align: center; }
+        .lic-box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; border: 4px solid #FFD700; width: 85%; max-width: 350px; backdrop-filter: blur(10px); }
+        .lic-input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 3px solid #fff; text-align: center; font-weight: 900; font-size: 16px; }
+        .lic-btn { width: 100%; padding: 12px; background: #FFD700; color: #000; border: 2px solid #fff; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 15px; box-shadow: 0 4px 0 #bfa15f; }
+        .lic-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bfa15f; }
+        .hidden { display: none !important; }
+        #validityPeriod { width: 90%; padding: 10px; border-radius: 8px; font-weight: 900; margin-bottom: 10px; border: 3px solid #000; }
+        .change-user-btn { background: transparent; border: 1px solid #fff; color: #fff; padding: 5px 10px; margin-top: 15px; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        .lang-bar { display: flex; justify-content: flex-end; padding: 5px 10px; background: #002147; border-bottom: 1px solid #FFD700; }
+        .lang-select { background: #FFD700; color: #000; font-weight: 900; border-radius: 5px; font-size: 11px; padding: 2px 5px; border: none; outline: none; }
+        #commChoiceBox { margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 15px; }
+        .comm-btn { width: 48%; padding: 10px; border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 13px; border: none; margin: 2px; color: white; display: inline-block; }
+        .btn-wa { background: #25D366; border: 2px solid #128c7e; box-shadow: 0 3px 0 #075e54; }
+        .btn-sms { background: #008CBA; border: 2px solid #005f7f; box-shadow: 0 3px 0 #004a63; }
+        .selected-plan-text { color: #FFD700; font-size: 14px; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 0 #000; }
+        #toastBox { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; z-index: 10000; left: 50%; bottom: 80px; transform: translateX(-50%); font-size: 14px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #FFD700; }
+        #toastBox.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 80px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 80px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 5px; color: #000; }
+        .container { max-width: 100%; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); border: 3px solid #002147; border-top: 8px solid #002147; overflow: hidden; box-sizing: border-box; }
+        @keyframes flashGold { 0% { background-color: #fff; } 50% { background-color: #ffd700; } 100% { background-color: #fff; } }
+        .header { text-align: center; padding: 15px; background: linear-gradient(180deg, #fff 0%, #e3f2fd 100%); border-bottom: 3px solid #002147; user-select: none; }
+        .header-blink { animation: flashGold 0.2s ease-in-out; }
+        h2 { color: #002147; margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; text-shadow: 1px 1px 0px #ccc; }
+        h4 { color: #b71c1c; margin: 5px 0 0 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .iso-badge { display: inline-block; background: #002147; color: #fff; font-size: 11px; font-weight: bold; padding: 5px 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #FFD700; }
+        .content { padding: 10px; }
+        .scale-box { background-color: #fff8e1; border: 3px solid #ffca28; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 5px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+        .scale-group { text-align: center; flex: 1; }
+        .scale-label { font-size: 13px; font-weight: 900; color: #e65100; display: block; margin-bottom: 5px; }
+        .scale-input { width: 100%; padding: 8px; font-size: 16px; border: 3px solid #e65100; border-radius: 8px; text-align: center; font-weight: 900; color: #000; box-sizing: border-box; background: #fff; }
+        .scale-arrow { font-size: 22px; color: #d84315; font-weight: 900; }
+        .clickable-header { font-size: 14px; font-weight: 900; color: #fff !important; margin-top: 15px; margin-bottom: 8px; display: block; background: #2e7d32; padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; box-shadow: 0 4px 0 #1b5e20; border: 1px solid rgba(0,0,0,0.1); user-select: none; }
+        .clickable-header:active { transform: translateY(2px); box-shadow: 0 2px 0 #1b5e20; }
+        .section-label { font-size: 14px; font-weight: 900; color: #002147; margin-top: 15px; margin-bottom: 8px; display: block; border-left: 6px solid #FFD700; padding-left: 10px; background: #e8eaf6; padding-top: 5px; padding-bottom: 5px; }
+        .share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #f1f8e9; padding: 10px; border-radius: 10px; border: 3px solid #7cb342; box-sizing: border-box; width: 100%; }
+        @media (max-width: 480px) { .share-grid { grid-template-columns: repeat(2, 1fr); } h2 { font-size: 18px; } }
+        .share-item { display: flex; flex-direction: column; min-width: 0; }
+        .share-item label { font-size: 11px; color: #33691e; margin-bottom: 3px; font-weight: 900; text-align: center;}
+        .share-item input { padding: 8px 4px; border: 2px solid #558b2f; border-radius: 6px; text-align: center; font-weight: 900; color: #002147; font-size: 15px; width: 100%; box-sizing: border-box; }
+        .share-item input:focus { outline: none; border-color: #2e7d32; background: #fff; box-shadow: 0 0 5px #a5d6a7; }
+        #unitType { width: 100%; padding: 12px 15px; border: 3px solid #d84315; border-radius: 8px; font-size: 16px; background-color: #fffde7; font-weight: 900; color: #bf360c; box-sizing: border-box; box-shadow: 0 4px 0px rgba(216, 67, 21, 0.2); outline: none; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D84315%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%0-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 16px auto; }
+        .land-input-container { margin-top: 10px; width: 100%; }
+        .single-input { width: 100%; padding: 12px; font-size: 18px; font-weight: 900; text-align: center; background-color: #fff3e0; color: #e65100; border: 3px solid #ff6f00; border-radius: 8px; box-shadow: 0 3px 5px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .mixed-land-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; display: none; width: 100%; }
+        @media (max-width: 400px) { .mixed-land-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
+        .land-box { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .land-box input { width: 100%; padding: 8px; font-size: 14px; font-weight: 900; border: 2px solid #1976d2; border-radius: 6px; text-align: center; color: #0d47a1; box-sizing: border-box; }
+        .land-box span { display: block; font-size: 11px; text-align: center; color: #0d47a1; margin-top: 3px; font-weight: 900; }
+        .micro-select { font-size: 11px; margin-top: 3px; border: 2px solid #1976d2; background: #bbdefb; font-weight: 900; color: #0d47a1; text-align-last: center; cursor: pointer; width: 100%; border-radius: 4px; padding: 2px 12px 2px 2px; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%230d47a1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%0-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 2px center; background-size: 8px auto; }
+        .btn-container { display: flex; gap: 10px; margin-top: 20px; }
+        button { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 900; box-shadow: 0 4px 0px rgba(0,0,0,0.2); flex: 1; border: 1px solid rgba(0,0,0,0.1); }
+        .btn-calc { background: linear-gradient(135deg, #002147, #1565c0); color: white; flex: 2; border-bottom: 4px solid #000; }
+        .btn-reset { background: linear-gradient(135deg, #c62828, #ef5350); color: white; flex: 1; border-bottom: 4px solid #b71c1c; }
+        button:active { transform: translateY(3px); box-shadow: none; border-bottom: none; }
+        .result-card { margin-top: 20px; display: none; background: #fff; border: 3px solid #002147; border-radius: 10px; overflow: hidden; width: 100%; box-sizing: border-box; }
+        .res-head { background: #002147; color: white; padding: 10px; text-align: center; font-weight: 900; font-size: 15px; border-bottom: 2px solid #FFD700; }
+        .res-content { padding: 15px; text-align: center; }
+        .big-res { font-size: 20px; font-weight: 900; color: #b71c1c; margin-bottom: 5px; line-height: 1.3; word-wrap: break-word; text-shadow: 1px 1px 0 #ffebee; }
+        .sub-res { font-size: 15px; margin-bottom: 12px; font-weight: 900; }
+        .c-dhurki { color: #d81b60; } .c-kanma { color: #4a148c; }  
+        .grid-res { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f5f5f5; padding: 10px; border-radius: 6px; text-align: left; font-size: 14px; border: 2px solid #bdbdbd; }
+        .res-label { font-weight: 900; color: #424242; display: block; font-size: 12px; }
+        .res-val { font-weight: 900; font-size: 15px; word-break: break-all; }
+        .c-dec { color: #2e7d32; } .c-sq { color: #c62828; }  .c-ac { color: #f57f17; }  .c-hec { color: #6a1b9a; } .c-kad { color: #00695c; } 
+        .table-wrap { margin-top: 20px; border: 2px solid #9e9e9e; border-radius: 8px; overflow-x: auto; width: 100%; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 300px; }
+        th { background: #37474f; color: white; padding: 10px; text-align: left; white-space: nowrap; border-bottom: 2px solid #000; font-weight: 900; }
+        td { padding: 8px; border-bottom: 2px solid #e0e0e0; vertical-align: top; color: #000; font-weight: 700; }
+        .hl-row { background-color: #fff9c4; font-weight: 900; color: #b71c1c; border-bottom: 2px solid #fbc02d; }
+        .mini-tool { margin-top: 20px; background-color: #e0f7fa; border: 3px dashed #006064; border-radius: 8px; padding: 12px; width: 100%; box-sizing: border-box; }
+        .mini-title { text-align: center; font-weight: 900; color: #006064; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
+        .mini-flex { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .mini-input { width: 100%; padding: 8px; border: 2px solid #00838f; border-radius: 6px; text-align: center; font-weight: 900; font-size: 14px; color: #004d40; box-sizing: border-box; background: #fff; }
+        .footer-info { margin-top: 20px; font-size: 11px; color: #424242; text-align: center; background: #e3f2fd; padding: 10px; border-radius: 6px; border: 2px solid #90caf9; font-weight: 900; }
+        .land-row { display: flex; gap: 3px; margin-bottom: 8px; align-items: flex-end; }
+        .lr-op { width: 32px; height: 34px; background: #fff; font-weight: 900; border: 2px solid #00796b; border-radius: 6px; text-align: center; color: #004d40; margin-bottom: 1px; }
+        .lr-box { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+        .lr-box-large { flex: 2.8; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+        .lr-label { font-size: 10px; color: #004d40; font-weight: bold; margin-bottom: 2px; }
+        .lr-in { width: 95%; padding: 6px 2px; text-align: center; font-weight: 900; border: 2px solid #4db6ac; border-radius: 5px; font-size: 14px; background: #fff; }
+        .lr-in:focus { border-color: #009688; outline: none; background: #e0f2f1; }
+        .lr-del { width: 26px; height: 32px; background: #ffcdd2; border: 1px solid #c62828; color: #b71c1c; font-weight: 900; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; margin-bottom: 1px; }
+        .micro-wrap { display: flex; gap: 2px; width: 100%; align-items: center; }
+        .micro-sel { font-size: 10px; border: 1px solid #00796b; border-radius: 4px; background: #b2dfdb; color: #004d40; font-weight: bold; width: 65px; height: 32px; text-align: center; }
+        .land-res-box { margin-top: 15px; background: #fff; border: 3px solid #00796b; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+<div id="licenseOverlay">
+    <div class="lic-box" id="loginBox">
+        <h2 id="l_h2">SKR GEO-LEGAL</h2>
+        <p id="l_p">SECURE LOGIN</p>
+        <input type="number" id="userMobile" class="lic-input" placeholder="Enter Mobile Number">
+        <button class="lic-btn" onclick="checkUser()" id="l_btn">LOGIN</button>
+    </div>
+    <div class="lic-box hidden" id="otpBox">
+        <h3 id="a_h3" style="color:#ff5252; text-shadow: 1px 1px 0 #fff;">ACTIVATION REQUIRED</h3>
+        <p id="a_p1" style="font-weight:bold;">This device needs a license.</p>
+        <p><span id="a_p2">Device ID:</span> <span id="deviceIdDisplay" style="color:#FFD700; font-weight:900; font-size:18px;"></span></p>
+        <p style="color:#fff; font-size:12px; margin-top:5px;"><span id="a_p3">User:</span> <span id="currentUserDisplay"></span></p>
+        <button class="lic-btn" style="background:#25D366; color:white; border-color:#128c7e;" onclick="prepareRequest(1)" id="p1">1. SELECT: 1 MONTH</button>
+        <button class="lic-btn" style="background:#ff9800; color:white; border-color:#e65100;" onclick="prepareRequest(3)" id="p3">2. SELECT: 3 MONTHS</button>
+        <button class="lic-btn" style="background:#673ab7; color:white; border-color:#4527a0;" onclick="prepareRequest(12)" id="p12">3. SELECT: 1 YEAR</button>
+        <div id="commChoiceBox" class="hidden">
+            <div class="selected-plan-text" id="selectedPlanText"></div>
+            <p style="color:white; font-size:11px; margin-bottom:5px;" id="s_via">Send Request via:</p>
+            <button class="comm-btn btn-wa" onclick="sendRequest('wa')">WhatsApp 💬</button>
+            <button class="comm-btn btn-sms" onclick="sendRequest('sms')">Message ✉️</button>
+        </div>
+        <div style="margin:15px 0; border-top:2px solid #fff;"></div>
+        <input type="password" id="otpInput" class="lic-input" placeholder="Enter OTP">
+        <button class="lic-btn" onclick="verifyOTP()" id="b_act">ACTIVATE NOW</button>
+        <button class="change-user-btn" onclick="changeUser()" id="b_wrong">🔄 Wrong Number? / Admin Login</button>
+    </div>
+    <div class="lic-box hidden" id="adminPanel">
+        <h3 style="color:#00ff00;">MASTER ADMIN</h3>
+        <p>Generate OTP for Client</p>
+        <select id="validityPeriod">
+            <option value="1">Valid: 1 Month (30 Days)</option>
+            <option value="3">Valid: 3 Months (90 Days)</option>
+            <option value="12">Valid: 1 Year (365 Days)</option>
+        </select>
+        <input type="number" id="clientMobileInAdmin" class="lic-input" placeholder="Client Mobile (for WA/SMS)">
+        <input type="text" id="clientDeviceId" class="lic-input" placeholder="Client Device ID">
+        <button class="lic-btn" onclick="generateClientOTP()">GENERATE CODE</button>
+        <div id="generatedCodeDisplay" style="font-size:24px; margin-top:10px; color:#00ff00; font-weight:bold;"></div>
+        <div id="adminCommOptions" class="hidden" style="margin-top:15px; border-top:1px dashed #fff; padding-top:10px;">
+            <p style="color:#fff; font-size:12px;">Send OTP to Client via:</p>
+            <button class="comm-btn btn-wa" style="width:48%;" onclick="sendOtpToClient('wa')">WhatsApp 💬</button>
+            <button class="comm-btn btn-sms" style="width:48%;" onclick="sendOtpToClient('sms')">Message ✉️</button>
+        </div>
+        <button class="lic-btn" style="background:#d32f2f; margin-top:20px; border:2px solid #b71c1c;" onclick="logoutMaster()">🔒 LOGOUT & LOCK</button>
+        <button class="lic-btn" style="background:#555; margin-top:10px; border-color:#333;" onclick="closeAdmin()">CLOSE</button>
+    </div>
+</div>
+<div id="toastBox"></div>
+<div class="container">
+    <div class="lang-bar">
+        <select class="lang-select" id="langSelector" onchange="changeLanguage()">
+            <option value="def">Default (English/हिन्दी)</option>
+            <option value="en">English</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="bh">भोजपुरी (Bhojpuri)</option>
+            <option value="mai">मैथिली (Maithili)</option>
+            <option value="kai">कैथी (Kaithi)</option>
+            <option value="ori">ଓଡ଼ିଆ (Odia)</option>
+        </select>
+    </div>
+    <div class="header" id="appHeader" onclick="handleHeaderTap()">
+        <h2 id="m_h2">SKR Geo-Legal Associates</h2>
+        <h4 id="m_h4">Smart Solutions & Digital Documentation</h4>
+        <div class="iso-badge" id="iso_b">ISO 9001:2015 & MSME REGD.</div>
+    </div>
+    <div class="content">
+        <div class="scale-box">
+            <div class="scale-group"><span class="scale-label" id="lbl_l">📏 लग्गा (हाथ - 1.5 ft)</span><input type="number" id="laggaInput" class="scale-input" value="6.5" oninput="updateFromLagga()"></div>
+            <div class="scale-arrow">⇄</div>
+            <div class="scale-group"><span class="scale-label" id="lbl_s">⚙️1 धुर (Sq.Ft)</span><input type="number" id="scaleInput" class="scale-input" value="95.0625" oninput="updateFromSqFt()"></div>
+        </div>
+        <div class="clickable-header" id="s_1" onclick="toggleShare()">1. हिस्सा / जमींदारी विवरण (Share Details):</div>
+        <div id="shareSectionContainer" class="hidden">
+            <div style="font-size:11px; color:#444; margin-bottom:5px; font-weight:700;" id="d_share">(डिफ़ॉल्ट: 16 आना = पूरी प्रॉपर्टी / Default: 16 Ana = Full Property)</div>
+            <div class="share-grid">
+                <div class="share-item"><label id="lbl_an">आना/Ana</label><input type="number" id="inAna" placeholder="0" value="16"></div>
+                <div class="share-item"><label id="lbl_gn">गंडा/Ganda</label><input type="number" id="inGanda" placeholder="0"></div>
+                <div class="share-item"><label id="lbl_kr">कौड़ी/Kauri</label><input type="number" id="inKauri" placeholder="0"></div>
+                <div class="share-item"><label id="lbl_kt">क्रन्त/Krant</label><input type="number" id="inKrant" placeholder="0"></div>
+                <div class="share-item"><label id="lbl_dn">दन्त/Dant</label><input type="number" id="inDant" placeholder="0"></div>
+                <div class="share-item"><label id="lbl_rn">रेन/Ren</label><input type="number" id="inRen" placeholder="0"></div>
+                <div class="share-item"><label id="lbl_ps">परस/Paras</label><input type="number" id="inParas" placeholder="0"></div>
+                <div class="share-item"><label id="lbl_kw">कनवाँ/Kanwan</label><input type="number" id="inKanwan" placeholder="0"></div>
+            </div>
+        </div>
+        <span class="section-label" id="s_2">2. रकबा की इकाई (Unit):</span>
+        <select id="unitType" onchange="toggleLandInputs()">
+            <option value="sqft" id="opt_sf">वर्ग फीट (Sq. Ft)</option>
+            <option value="sqyard" id="opt_sy">वर्ग गज (Sq. Yard)</option>
+            <option value="sqkadi" id="opt_sk">वर्ग कड़ी (Sq. Kadi)</option>
+            <option value="decimal" id="opt_dc">डिसमिल (Decimal)</option>
+            <option value="acre" id="opt_ac">एकड़ (Acre)</option>
+            <option value="hectare" id="opt_hc">हेक्टेयर (Hectare)</option>
+            <option value="sqmeter" id="opt_sm">वर्ग मीटर (Sq. Meter)</option>
+            <option disabled>──────────</option>
+            <option value="local_mixed" id="opt_mx">बिघा - कट्ठा - धुर - (धुरकी/कनवाँ)</option>
+        </select>
+        <span class="section-label" id="s_3">3. रकबा का मान (Value):</span>
+        <div class="land-input-container">
+            <input type="number" id="singleInput" class="single-input" placeholder="Enter Value..." step="any">
+            <div id="mixedInput" class="mixed-land-grid">
+                <div class="land-box"><input type="number" id="inBigha" placeholder="0"><span id="bg_label">बिघा</span></div>
+                <div class="land-box"><input type="number" id="inKatha" placeholder="0"><span id="kt_label">कट्ठा</span></div>
+                <div class="land-box"><input type="number" id="inDhur" placeholder="0"><span id="dh_label">धुर</span></div>
+                <div class="land-box"><input type="number" id="inMicro" placeholder="0">
+                    <select id="microUnit" class="micro-select">
+                        <option value="kanwan" selected id="opt_kw_sel">कनवाँ</option>
+                        <option value="dhurki" id="opt_dk_sel">धुरकी</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="btn-container">
+            <button class="btn-calc" onclick="calculate()" id="b_calc">गणना करें (CALCULATE)</button>
+            <button class="btn-reset" onclick="resetAll()" id="b_reset">RESET</button>
+        </div>
+        <div id="resultBox" class="result-card">
+            <div class="res-head" id="r_head">📊 परिणाम (Result)</div>
+            <div class="res-content">
+                <div style="font-size:12px; color:#444; margin-bottom:5px; font-weight:700;" id="r_ent">आपका दर्ज किया गया रकबा: (Your Entered Area:)</div>
+                <div class="big-res" id="resText"></div>
+                <div class="sub-res" id="resSub"></div>
+                <div class="grid-res">
+                    <div><span class="res-label" id="l_dec">Decimal:</span> <span class="res-val c-dec" id="rDec"></span></div>
+                    <div><span class="res-label" id="l_hec">Hectare:</span> <span class="res-val c-hec" id="rHec"></span></div>
+                    <div style="grid-column: span 2;"><span class="res-label" id="l_acd">Acre-Dec:</span> <span class="res-val c-ac" id="rAcreSplit"></span> <span style="font-size:11px; color:#444; margin-left:5px;">(<span id="l_tot">Total</span>: <span id="rAcre"></span> Ac)</span></div>
+                    <div style="border-top:2px dashed #999; margin-top:5px; padding-top:5px;"><span class="res-label" id="l_kad">Sq.Kadi:</span> <span class="res-val c-kad" style="font-size:15px;" id="rSqKadi"></span></div>
+                    <div style="border-top:2px dashed #999; margin-top:5px; padding-top:5px;"><span class="res-label" id="l_sqf">Sq.Ft:</span> <span class="res-val c-sq" style="font-size:15px;" id="rSqFt"></span></div>
+                    <div style="border-top:2px dashed #999; margin-top:5px; padding-top:5px; grid-column: span 2;"><span class="res-label" id="l_gaj">Sq.Yard:</span> <span class="res-val" style="color:#d84315; font-size:15px;" id="rSqYard"></span></div>
+                    <div style="border-top:2px dashed #999; margin-top:5px; padding-top:5px; grid-column: span 2;"><span class="res-label" id="l_sqm">Sq.Meter:</span> <span class="res-val" style="color:#004d40; font-size:15px;" id="rSqMeter"></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <div class="clickable-header" id="b_title" onclick="toggleTable()">🔻 कुल 16 आना का विवरण (Full Property Logic)</div>
+            <table id="breakdownTable" class="hidden"></table>
+        </div>
+        <button class="lic-btn" style="background:#00838f; color:#fff; margin-top:15px; border-color:#006064; box-shadow:0 4px 0 #004d40;" onclick="toggleConverter()" id="btn_toggle_conv">📏 लंबाई एवं क्षेत्रफल परिवर्तक (Unit Converter)</button>
+        <div id="converterContainer" class="mini-tool hidden" style="margin-top:10px; border-color:#00838f; background:#e0f7fa;">
+            <div class="mini-title" id="c_title_len">🔗 त्वरित लंबाई परिवर्तक (Length Converter)</div>
+            <div class="mini-flex">
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_kadi">कड़ी (Kadi)</label><input type="number" id="qKadi" class="mini-input" placeholder="0" oninput="syncLen('k')"></div>
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_feet">फिट (Feet)</label><input type="number" id="qFeet" class="mini-input" placeholder="0" oninput="syncLen('f')"></div>
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_meter">मीटर (Meter)</label><input type="number" id="qMeter" class="mini-input" placeholder="0" oninput="syncLen('m')"></div>
+            </div>
+            <div class="mini-title" style="margin-top:15px;" id="c_title_area">🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter)</div>
+            <div class="mini-flex">
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqk">वर्ग कड़ी (Sq.Kadi)</label><input type="number" id="qSKadi" class="mini-input" placeholder="0" oninput="syncArea('sk')"></div>
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqf_l">वर्ग फिट (Sq.Ft)</label><input type="number" id="qSFeet" class="mini-input" placeholder="0" oninput="syncArea('sf')"></div>
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqm_l">वर्ग मीटर (Sq.Mtr)</label><input type="number" id="qSMeter" class="mini-input" placeholder="0" oninput="syncArea('sm')"></div>
+            </div>
+        </div>
+        <button class="lic-btn" style="background:#009688; color:#fff; margin-top:15px; border-color:#00796b; box-shadow:0 4px 0 #004d40;" onclick="toggleLandCalc()" id="b_toggle">➕ जमीन जोड़ / घटाव (Land Calculator)</button>
+        <div id="landCalcContainer" class="mini-tool hidden" style="margin-top:10px; border-color:#009688; background:#e0f2f1; padding:8px;">
+            <div class="mini-title" style="color:#00796b; font-size:14px; margin-bottom:12px;" id="ad_title">जमीन जोड़ / घटाव (Land Adder)</div>
+            <div id="landRowsArea"></div>
+            <button class="lic-btn" style="background:#00796b; color:white; font-size:12px; padding:8px; width:48%; display:inline-block; margin-right:2%; border:none; box-shadow:0 3px 0 #004d40;" onclick="addLandRow()" id="b_add">+ पंक्ति जोड़ें (Add Row)</button>
+            <button class="lic-btn" style="background:#004d40; color:white; font-size:12px; padding:8px; width:48%; display:inline-block; border:none; box-shadow:0 3px 0 #00251a;" onclick="calcLandTotal()" id="b_tot">= कुल (Total)</button>
+            <div id="landTotalRes" class="land-res-box hidden"></div>
+        </div>
+        <div class="footer-info"><b>SKR GEO-LEGAL ASSOCIATES</b><br>Smart Solutions & Digital Documentation</div>
+    </div>
+</div>
+<script>
+    /* --- [१. बुनियादी सेटिंग्स] --- */
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJ-MQyHBEukx6t03zFAeApGKpB7CbIDwU64kXeDh5R1ZJ6MquuavVqwY2hW9b5oGbv/exec";
+    const APP_ID = "SKR_ULTIMATE_CALC";
+    const MASTER_NUMBER = "6200263472"; 
+    const MASTER_PIN = "30112011"; 
+
+    /* --- [२. फिंगरप्रिंट (स्थायी पहचान)] --- */
+    function getHPID() {
+        const n = window.navigator;
+        const s = window.screen;
+        let str = n.userAgent + n.language + s.colorDepth + s.width + n.height + n.hardwareConcurrency;
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) { hash = (hash << 5) - hash + str.charCodeAt(i); hash |= 0; }
+        return "HW-" + Math.abs(hash);
+    }
+    const hpid = getHPID();
+
+    /* --- [३. डिवाइस आईडी (रैंडम - ओटीपी के लिए)] --- */
+    let deviceId = localStorage.getItem('skr_final_device');
+    if(!deviceId) { 
+        deviceId = Math.floor(100000 + Math.random() * 900000).toString(); 
+        localStorage.setItem('skr_final_device', deviceId); 
+    }
+
+    /* --- [४. डेटा सिंक एवं रिकवरी] --- */
+    async function syncToCloud(exp, mob) {
+        try {
+            fetch(SCRIPT_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ aid: APP_ID, hpid: hpid, exp: exp, mob: mob, did: deviceId }) 
+            });
+        } catch(e) { console.log("Sync Fail"); }
+    }
+
+    async function recoverFromCloud() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?hpid=${hpid}&aid=${APP_ID}`);
+            const text = await response.text();
+            if (text === "not_found") return null;
+            return JSON.parse(text);
+        } catch(e) { return null; }
+    }
+
+    /* --- [५. सुरक्षा और लॉगिन सिस्टम] --- */
+    let currentUser = localStorage.getItem('skr_final_user');
+
+    async function initSecurity() {
+        currentUser = localStorage.getItem('skr_final_user');
+        document.getElementById('deviceIdDisplay').innerText = deviceId;
+        
+        // मास्टर लॉगिन चेक
+        if (currentUser === MASTER_NUMBER) {
+            unlockApp(true);
+            finalizeInit();
+            return;
+        }
+
+        let expiry = localStorage.getItem('skr_final_expiry');
+        
+        // ऑटो रिकवरी (अगर डेटा डिलीट हुआ हो)
+        if (!expiry) {
+            let rec = await recoverFromCloud();
+            if (rec && parseInt(rec.exp) > Date.now()) {
+                localStorage.setItem('skr_final_expiry', rec.exp);
+                localStorage.setItem('skr_final_user', rec.mob);
+                localStorage.setItem('skr_final_device', rec.did); 
+                deviceId = rec.did;
+                currentUser = rec.mob;
+                expiry = rec.exp;
+                showToast("✅ लाइसेंस बहाल (Recovered)");
+            }
+        }
+
+        // समय चेक
+        if (expiry && parseInt(expiry) > Date.now()) {
+            unlockApp();
+            let d = new Date(parseInt(expiry));
+            showToast("⌛ एक्सपायरी: " + d.toLocaleDateString());
+        } else {
+            document.getElementById('licenseOverlay').style.display = 'flex';
+        }
+        finalizeInit();
+    }
+
+    function checkUser() {
+        let m = document.getElementById('userMobile').value;
+        if (!m || m.length < 10) return;
+        
+        if (m === MASTER_NUMBER) {
+            let p = prompt("🔐 PIN:");
+            if (p === MASTER_PIN) {
+                localStorage.setItem('skr_final_user', m);
+                currentUser = m;
+                unlockApp(true);
+            }
+        } else {
+            localStorage.setItem('skr_final_user', m);
+            currentUser = m;
+            document.getElementById('currentUserDisplay').innerText = m;
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('otpBox').classList.remove('hidden');
+        }
+    }
+
+    function verifyOTP() { 
+        let input = document.getElementById('otpInput').value; 
+        let c1 = getSmartCode(deviceId, 1), c3 = getSmartCode(deviceId, 3), c12 = getSmartCode(deviceId, 12); 
+        let exp = 0;
+        if (input === c1) exp = Date.now() + 30*24*60*60*1000; 
+        else if (input === c3) exp = Date.now() + 90*24*60*60*1000; 
+        else if (input === c12) exp = Date.now() + 365*24*60*60*1000; 
+        else { showToast("❌ Invalid Code"); return; }
+        
+        localStorage.setItem('skr_final_expiry', exp);
+        syncToCloud(exp, currentUser); 
+        unlockApp(); 
+    }
+
+    function unlockApp(isMaster = false) { 
+        document.getElementById('licenseOverlay').style.display = 'none'; 
+        if(isMaster) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            showToast("👑 MASTER ADMIN"); 
+        }
+    }
+
+    /* --- [६. मैसेजिंग और एडमिन] --- */
+    let selectedDuration = 1;
+    function prepareRequest(months) { 
+        selectedDuration = months; 
+        document.getElementById('selectedPlanText').innerText = "Selected Plan: " + (months==12?"1 Year":months+" Months"); 
+        document.getElementById('commChoiceBox').classList.remove('hidden'); 
+    }
+
+    function sendRequest(method) {
+        let msg = `🚩 *एसकेआर जिओ लीगल एसोसिएट्स* 🚩\n\nविषय: *सॉफ्टवेयर एक्टिवेशन हेतु कानूनी अनुरोध*\n\nश्रीमान, मैं अपनी स्वेच्छा से आपकी डिजिटल सेवा लेना चाहता हूँ। कृपया मेरे डिवाइस को सक्रिय करें।\n\n📱 मोबाइल: ${currentUser}\n🆔 डिवाइस आईडी: ${deviceId}\n🔗 फिंगरप्रिंट: ${hpid}\n📅 प्लान: ${selectedDuration==12?"1 Year":selectedDuration+" Month"}\n\nधन्यवाद।`;
+        let encoded = encodeURIComponent(msg);
+        if (method === 'wa') window.open(`https://wa.me/91${MASTER_NUMBER}?text=${encoded}`, '_blank');
+        else window.open(`sms:${MASTER_NUMBER}?body=${encoded}`, '_blank');
+    }
+
+    function sendOtpToClient(method) {
+        let cmob = document.getElementById('clientMobileInAdmin').value;
+        let cotp = document.getElementById('generatedCodeDisplay').innerText;
+        let cdid = document.getElementById('clientDeviceId').value;
+        let cexp = document.getElementById('validityPeriod').value;
+        let d = new Date(); d.setDate(d.getDate() + (cexp*30));
+        let msg = `🎊 *बधाई हो! आपकी सेवा सक्रिय है* 🎊\n\n*SKR GEO-LEGAL ASSOCIATES*\nआपका सॉफ्टवेयर सफलतापूर्वक अपडेट कर दिया गया है।\n\n🔑 कोड: *${cotp}*\n🆔 डिवाइस आईडी: ${cdid}\n⌛ आखरी तिथि: ${d.toLocaleDateString()}\n\nहमारी सेवा चुनने के लिए धन्यवाद। शुभकामनाएँ!`;
+        let encoded = encodeURIComponent(msg);
+        if (method === 'wa') window.open(`https://wa.me/91${cmob}?text=${encoded}`, '_blank');
+        else window.open(`sms:${cmob}?body=${encoded}`, '_blank');
+    }
+
+    /* --- [७. कैलकुलेटर फंक्शन्स - यथावत] --- */
+    const i18n = {
+        def: { bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना/Ana", lbl_gn: "गंडा/Ganda", lbl_kr: "कौड़ी/Kauri", lbl_kt: "क्रन्त/Krant", lbl_dn: "दन्त/Dant", lbl_rn: "रेन/Ren", lbl_ps: "परस/Paras", lbl_kw: "कनवाँ/Kanwan", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (Sq.Ft)", s_1: "1. हिस्सा / जमींदारी विवरण (Share Details):", r_head: "📊 परिणाम (Result)", r_ent: "आपका दर्ज किया गया रकबा: (Your Entered Area:)", s_2: "2. रकबा की इकाई (Unit):", s_3: "3. रकबा का मान (Value):", b_calc: "गणना करें (CALCULATE)", b_title: "🔻 कुल 16 आना का विवरण (Full Property Logic)", btn_toggle_conv: "📏 लंबाई एवं क्षेत्रफल परिवर्तक (Unit Converter)", b_toggle: "➕ जमीन जोड़ / घटाव (Land Calculator)", c_title_len: "🔗 त्वरित लंबाई परिवर्तक (Length Converter)", c_title_area: "🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter)", l_kadi: "कड़ी (Kadi)", l_feet: "फिट (Feet)", l_meter: "मीटर (Meter)", l_sqk: "वर्ग कड़ी (Sq.Kadi)", l_sqf_l: "वर्ग फिट (Sq.Ft)", l_sqm_l: "वर्ग मीटर (Sq.Mtr)", ad_title: "जमीन जोड़ / घटाव (Land Adder)", b_add: "+ पंक्ति जोड़ें (Add Row)", b_tot: "= कुल (Total)", opt_sf: "वर्ग फीट (Sq. Ft)", opt_sy: "वर्ग गज (Sq. Yard)", opt_sk: "वर्ग कड़ी (Sq. Kadi)", opt_dc: "डिसमिल (Decimal)", opt_ac: "एकड़ (Acre)", opt_hc: "हेक्टेयर (Hectare)", opt_sm: "वर्ग मीटर (Sq. Meter)", opt_mx: "बिघा - कट्ठा - धुर - (धुरकी/कनवाँ)", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", la_mi: "छोटी इकाई (Micro)", lbl_16ana: "16 आना (Full)" },
+        en: { bg_label: "Bigha", kt_label: "Katha", dh_label: "Dhur", dhu: "Dhurki", kan: "Kanwan", lbl_an: "Ana", lbl_gn: "Ganda", lbl_kr: "Kauri", lbl_kt: "Krant", lbl_dn: "Dant", lbl_rn: "Ren", lbl_ps: "Paras", lbl_kw: "Kanwan", lbl_l: "📏 Lagga (Hand - 1.5 ft)", lbl_s: "⚙️1 Dhur (Sq.Ft)", s_1: "1. Share / Zamindari Details:", r_head: "📊 Result", r_ent: "Your Entered Area:", s_2: "2. Unit Type:", s_3: "3. Value:", b_calc: "CALCULATE", b_title: "🔻 Breakdown of 16 Ana (Full Logic)", btn_toggle_conv: "📏 Unit Converter", b_toggle: "➕ Land Calculator", c_title_len: "🔗 Length Converter", c_title_area: "🔗 Area Converter", l_kadi: "Kadi", l_feet: "Feet", l_meter: "Meter", l_sqk: "Sq.Kadi", l_sqf_l: "Sq.Ft", l_sqm_l: "Sq.Mtr", ad_title: "Land Adder", b_add: "+ Add Row", b_tot: "= Total", opt_sf: "Sq. Ft", opt_sy: "Sq. Yard", opt_sk: "Sq. Kadi", opt_dc: "Decimal", opt_ac: "Acre", opt_hc: "Hectare", opt_sm: "Sq. Meter", opt_mx: "Bigha - Katha - Dhur", opt_kw_sel: "Kanwan", opt_dk_sel: "Dhurki", la_mi: "Micro Unit", lbl_16ana: "16 Ana (Full)" },
+        bn: { m_h2: "SKR জিও-লিগ্যাল অ্যাসোসিয়েটস", m_h4: "স্মার্ট সলিউশন এবং ডিজিটাল ডকুমেন্টেশন", bg_label: "বিঘা", kt_label: "কাঠা", dh_label: "ধুর", dhu: "ধুরকি", kan: "কনওয়া", lbl_an: "আনা", lbl_gn: "গণ্ডা", lbl_kr: "কড়ি", lbl_kt: "ক্রান্ত", lbl_dn: "দন্ত", lbl_rn: "রেণ", lbl_ps: "পরস", lbl_kw: "কনওয়া", lbl_l: "📏 লগ্গা (হাত - ১.৫ ফুট)", lbl_s: "⚙️১ ধুর (বর্গ ফুট)", s_1: "১. অংশ / জমিদারী বিবরণ:", s_2: "২. ইউনিটের ধরন:", s_3: "৩. রডবার মান:", b_calc: "হিসাব করুন", b_title: "🔻 ১৬ আনার বিবরণ", btn_toggle_conv: "📏 একক রূপান্তরকারী", b_toggle: "➕ জমি যোগকারী", c_title_len: "🔗 দৈর্ঘ্য রূপান্তরকারী", c_title_area: "🔗 ক্ষেত্রফল রূপান্তরকারী", l_kadi: "কড়ি", l_feet: "ফুট", l_meter: "মিটার", l_sqk: "বর্গ কড়ি", l_sqf_l: "বর্গ ফুট", l_sqm_l: "বর্গ মিটার", ad_title: "জমি যোগকারী", b_add: "+ লাইন যোগ করুন", b_tot: "= মোট", opt_sf: "বর্গ ফুট", opt_sy: "বর্গ গজ", opt_sk: "বর্গ কড়ি", opt_dc: "ডেসিমেল", opt_ac: "একর", opt_hc: "হেক্টর", opt_sm: "বর্গ মিটার", opt_mx: "বিঘা - কাঠা - ধুর", opt_kw_sel: "কনওয়া", opt_dk_sel: "ধুরকি", r_head: "📊 ফলাফল", r_ent: "আপনার প্রবেশ করা এলাকা:", la_mi: "ছোট ইউনিট", lbl_16ana: "১৬ আনা (Full)" },
+        mr: { m_h2: "SKR जिओ-लीगल असोसिएट्स", m_h4: "स्मार्ट सोल्युशन्स आणि डिजिटल दस्तऐजीकरण", bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हात - १.५ ft)", lbl_s: "⚙️१ धुर (चौ.फूट)", s_1: "१. हिस्सा / जमीनदारी तपशील:", s_2: "२. रक्कबा एकक:", s_3: "३. रक्कबा मूल्य:", b_calc: "गणना करा", b_title: "🔻 १६ आना तपशील", btn_toggle_conv: "📏 युनिट कन्व्हर्टर", b_toggle: "➕ जमीन बेरीज यंत्र", c_title_len: "🔗 लांबी परिवर्तक", c_title_area: "🔗 क्षेत्र परिवर्तक", l_kadi: "कडी", l_feet: "फूट", l_meter: "मीटर", l_sqk: "चौ.कडी", l_sqf_l: "चौ.फूट", l_sqm_l: "चौ.मीटर", ad_title: "जमीन बेरीज यंत्र", b_add: "+ ओळ जोडा", b_tot: "= एकूण", opt_sf: "चौ. फूट", opt_sy: "चौ. वार", opt_sk: "चौ. कडी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "चौ. मीटर", opt_mx: "बिघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 निकाल", r_ent: "तुमचे प्रविष्ट क्षेत्र:", la_mi: "लहान युनिट", lbl_16ana: "१६ आना (Full)" },
+        bh: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबा के इकाई:", s_3: "3. रकबा के मान:", b_calc: "हिसाब करीं", b_title: "🔻 कुल 16 आना के विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 रकबा परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ लाइन जोड़ीं", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "रउआ दर्ज कइले रकबा:", la_mi: "छोटका इकाई", lbl_16ana: "१६ आना (Full)" },
+        mai: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबाक इकाई:", s_3: "3. रकबाक मान:", b_calc: "हिसाब करू", b_title: "🔻 कुल 16 आनाक विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 क्षेत्रफल परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ पंक्ति जोड़ू", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "अहाँक दर्ज कयल रकबा:", la_mi: "छोट इकाई", lbl_16ana: "१६ आना (Full)" },
+        kai: { m_h2: "𑂮𑂹𑂍𑂹𑂩 𑂔𑂱𑂨𑂷-𑂪𑂱𑂏𑂪 𑂉𑂮𑂷𑂮𑂱𑂉𑂗𑂹𑂮", m_h4: "𑂮𑂹𑂧𑂰𑂩𑂹𑂗 𑂮𑂷𑂪𑂹𑂨𑂴𑂬𑂢", bg_label: "𑂥𑂱𑂐𑂰", kt_label: "𑂍𑂗𑂹𑂗𑂰", dh_label: "𑂠𑂳𑂩", dhu: "𑂠𑂳𑂩𑂍𑂲", kan: "𑂍𑂢𑂥𑂰𑂁", lbl_an: "𑂄𑂢𑂰", lbl_gn: "𑂏𑂁𑂗𑂰", lbl_kr: "𑂍𑂷𑂚𑂲", lbl_kt: "𑂍𑂹𑂩𑂢𑂹𑂞", lbl_dn: "𑂠𑂢𑂹𑂞", lbl_rn: "𑂩𑂉𑂢", lbl_ps: "𑂣𑂩𑂮", lbl_kw: "𑂍𑂢𑂥𑂰𑂁", lbl_l: "📏 𑂪𑂏𑂹𑂏𑂰 (𑂯𑂰𑂟 - 1.5 ft)", lbl_s: "⚙️१ 𑂠𑂳𑂩 (𑂥𑂩𑂹𑂏 𑂤𑂲𑂗)", s_1: "1. 𑂯𑂱𑂮𑂹𑂮𑂰 / 𑂔𑂧𑂲𑂁𑂠𑂰𑂩𑂲 𑂥𑂱𑂨𑂷𑂩𑂰:", b_title: "🔻 𑂍𑂳𑂪 16 𑂄𑂢𑂰 𑂥𑂱𑂨𑂷𑂩𑂰", btn_toggle_conv: "📏 𑂪𑂁𑂥𑂰𑂆 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", b_toggle: "➕ 𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", s_2: "2. 𑂉𑂍𑂰𑂆:", s_3: "3. 𑂩𑂍𑂥𑂰 𑂧𑂰𑂢:", b_calc: "𑂏𑂝𑂝𑂰 𑂍𑂩𑂲𑂁", c_title_len: "🔗 𑂪𑂁𑂥𑂰𑂆 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", c_title_area: "🔗 𑂩𑂍𑂥𑂰 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", l_kadi: "𑂍𑂚𑂲", l_feet: "𑂤𑂲𑂗", l_meter: "𑂧𑂲𑂗𑂩", l_sqk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", l_sqf_l: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", l_sqm_l: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", ad_title: "𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", b_add: "+ 𑂣𑂁𑂍𑂹𑂞𑂱 𑂔𑂷𑂚𑂲𑂁", b_tot: "= 𑂍𑂳𑂪", opt_sf: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", opt_sy: "𑂥𑂩𑂹𑂏 𑂏𑂔", opt_sk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", opt_dc: "𑂗𑂱𑂮𑂧𑂱𑂪", opt_ac: "𑂉𑂍𑂚", opt_hc: "𑂯𑂯𑂉𑂍𑂹𑂗𑂨𑂩", opt_sm: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", opt_mx: "𑂥𑂱𑂐𑂰 - 𑂍𑂗𑂹𑂗𑂰 - 𑂠𑂳𑂩", opt_kw_sel: "𑂍𑂢𑂥𑂰𑂁", opt_dk_sel: "𑂠𑂳𑂩𑂍𑂲", la_mi: "𑂓𑂷𑂗 𑂆𑂍𑂰𑂆", r_head: "📊 𑂣𑂩𑂱𑂝𑂰𑂧", r_ent: "𑂄𑂣𑂍 𑂠𑂩𑂹𑂔 𑂍𑂆𑂪 𑂩𑂍𑂥𑂰:", lbl_16ana: "१६ आना (Full)" },
+        ori: { bg_label: "ବିଘା", kt_label: "କଟା", dh_label: "ଧୂର", dhu: "ଧୂରକୀ", kan: "କନୱା", lbl_an: "ଅଣା", lbl_gn: "ଗଣ୍ଡା", lbl_kr: "କଡ଼ି", lbl_kt: "କ୍ରାନ୍ତ", lbl_dn: "ଦନ୍ତ", lbl_rn: "ରେଣ", lbl_ps: "ପरସ", lbl_kw: "କନୱା", lbl_l: "📏 ଲଗା (ହାତ - ୧.୫ ft)", lbl_s: "⚙️୧ ଧୂର (ବର୍ଗ ଫୁଟ)", s_1: "୧. ଅଂଶ / ଜମିଦାରୀ ବିବରଣୀ:", s_2: "୨. ରକବା ର ଏକକ:", s_3: "୩. ରକବା ର ମୂଲ୍ୟ:", b_calc: "ଗଣନା କରନ୍ତୁ", b_title: "🔻 ୧୬ ଅଣାର ବିବରଣୀ", btn_toggle_conv: "📏 ଲମ୍ବ ଏବଂ କ୍ଷେତ୍ରଫଳ ପରିବର୍ତ୍ତକ", b_toggle: "➕ ଜମି ଯୋଗକାରୀ", c_title_len: "🔗 ଲମ୍ବ ପରିବର୍ତ୍ତକ", c_title_area: "🔗 କ୍ଷେତ୍ରଫଳ ପରିବର୍ତ୍ତକ", l_kadi: "କଡ଼ି", l_feet: "ଫୁଟ", l_meter: "ମିଟର", l_sqk: "ବର୍ଗ କଡ଼ି", l_sqf_l: "ବର୍ଗ ଫୁଟ", l_sqm_l: "ବର୍ଗ ମିଟର", ad_title: "ଜମି ଯୋଗକାରୀ", b_add: "+ ଧାଡ଼ି ଯୋଡ଼ନ୍ତୁ", b_tot: "= ମୋଟ", opt_sf: "ବର୍ଗ ଫୁଟ", opt_sy: "ବର୍ଗ ଗଜ", opt_sk: "ବର୍ଗ କଡ଼ି", opt_dc: "ଡେସିମେଲ", opt_ac: "ଏକର", opt_hc: "ହେକ୍ଟର", opt_sm: "ବର୍ଗ ମିଟର", opt_mx: "ବିଘା - କଟା - ଧୂର", opt_kw_sel: "କନୱା", opt_dk_sel: "ଧୂରକୀ", la_mi: "କ୍ଷୁଦ୍ର ଏକକ", r_head: "📊 ଫଳାଫଳ", r_ent: "ଆପଣଙ୍କର ପ୍ରବେଶ କ୍ଷେତ୍ର:", lbl_16ana: "୧୬ ଅଣା (Full)" }
+    };
+
+    function applyLanguage(lang) {
+        let data = i18n[lang] || i18n.def;
+        let defaultData = i18n.def;
+        for (let id in defaultData) { let el = document.getElementById(id); if (el) el.innerText = defaultData[id]; }
+        for (let id in data) { let el = document.getElementById(id); if (el) el.innerText = data[id]; }
+        let unitType = document.getElementById('unitType');
+        if(unitType) {
+           unitType.options[0].text = (i18n[lang] && i18n[lang].opt_sf) ? i18n[lang].opt_sf : i18n.def.opt_sf;
+           unitType.options[1].text = (i18n[lang] && i18n[lang].opt_sy) ? i18n[lang].opt_sy : i18n.def.opt_sy;
+           unitType.options[2].text = (i18n[lang] && i18n[lang].opt_sk) ? i18n[lang].opt_sk : i18n.def.opt_sk;
+           unitType.options[3].text = (i18n[lang] && i18n[lang].opt_dc) ? i18n[lang].opt_dc : i18n.def.opt_dc;
+           unitType.options[4].text = (i18n[lang] && i18n[lang].opt_ac) ? i18n[lang].opt_ac : i18n.def.opt_ac;
+           unitType.options[5].text = (i18n[lang] && i18n[lang].opt_hc) ? i18n[lang].opt_hc : i18n.def.opt_hc;
+           unitType.options[6].text = (i18n[lang] && i18n[lang].opt_sm) ? i18n[lang].opt_sm : i18n.def.opt_sm;
+           unitType.options[unitType.options.length-1].text = (i18n[lang] && i18n[lang].opt_mx) ? i18n[lang].opt_mx : i18n.def.opt_mx;
+        }
+        updateLandAdderLabels();
+        if (document.getElementById('resultBox').style.display === 'block') calculate();
+        if (document.getElementById('landTotalRes').innerHTML !== "") calcLandTotal();
+    }
+    function changeLanguage() { let lang = document.getElementById('langSelector').value; localStorage.setItem('skr_user_lang_final', lang); applyLanguage(lang); }
+    
+    function finalizeInit() {
+        document.getElementById('deviceIdDisplay').innerText = deviceId;
+        let savedL = localStorage.getItem('skr_user_lang_final') || 'def';
+        document.getElementById('langSelector').value = savedL;
+        applyLanguage(savedL);
+    }
+
+    function showToast(message) { let x = document.getElementById("toastBox"); x.innerText = message; x.className = "show"; setTimeout(() => x.className = "", 2500); }
+    
+    function unlockApp(isMaster = false) { 
+        document.getElementById('licenseOverlay').style.display = 'none'; 
+        if(isMaster) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            showToast("👑 MASTER ADMIN"); 
+        }
+    }
+
+    function logoutMaster() { if(confirm("Logout?")) { localStorage.removeItem('skr_final_user'); location.reload(); } }
+    
+    function changeUser() { localStorage.removeItem('skr_final_user'); location.reload(); }
+
+    function getSmartCode(dId, months) { let d = new Date(); let day = d.getDate(); let m = d.getMonth() + 1; let y = d.getFullYear(); let f = months == 1 ? (day*765+m*876+y*5) : months == 3 ? (day*333+m*222+y*10) : (day*111+m*999+y*20); return (parseInt(dId) + (months==1?12345:months==3?54321:99999) + f).toString(); }
+
+    let tapCount = 0; let tapTimer = null; 
+    function handleHeaderTap() { 
+        let header = document.getElementById('appHeader');
+        header.classList.add('header-blink');
+        setTimeout(() => header.classList.remove('header-blink'), 1000);
+
+        if(localStorage.getItem('skr_final_user') !== MASTER_NUMBER) return; 
+        tapCount++; 
+        clearTimeout(tapTimer); 
+        tapTimer = setTimeout(() => { tapCount = 0; }, 600); 
+        if(tapCount >= 5) { openAdminPanel(); tapCount = 0; } 
+    }
+
+    function openAdminPanel() { 
+        document.getElementById('licenseOverlay').style.display = 'flex'; 
+        document.getElementById('loginBox').classList.add('hidden'); 
+        document.getElementById('otpBox').classList.add('hidden'); 
+        document.getElementById('adminPanel').classList.remove('hidden'); 
+    }
+
+    function generateClientOTP() { let cid = document.getElementById('clientDeviceId').value; if(cid) { document.getElementById('generatedCodeDisplay').innerText = getSmartCode(cid, document.getElementById('validityPeriod').value); document.getElementById('adminCommOptions').classList.remove('hidden'); } }
+    function closeAdmin() { document.getElementById('licenseOverlay').style.display = 'none'; }
+    function toggleShare() { document.getElementById('shareSectionContainer').classList.toggle('hidden'); }
+    function toggleTable() { document.getElementById('breakdownTable').classList.toggle('hidden'); }
+    function toggleConverter() { document.getElementById('converterContainer').classList.toggle('hidden'); }
+    function toggleLandCalc() { document.getElementById('landCalcContainer').classList.toggle('hidden'); if(!document.getElementById('landCalcContainer').classList.contains('hidden') && document.querySelectorAll('.land-row').length === 0) addLandRow(); }
+    
+    function syncLen(src) {
+        let k = document.getElementById('qKadi'), f = document.getElementById('qFeet'), m = document.getElementById('qMeter');
+        let val = parseFloat(src === 'k' ? k.value : src === 'f' ? f.value : m.value);
+        if (!val || val === 0 || isNaN(val)) { k.value = ""; f.value = ""; m.value = ""; return; }
+        let baseFeet = (src === 'k') ? val * 0.66 : (src === 'f') ? val : val / 0.3048;
+        if(src !== 'k') k.value = (baseFeet / 0.66).toFixed(2);
+        if(src !== 'f') f.value = baseFeet.toFixed(2);
+        if(src !== 'm') m.value = (baseFeet * 0.3048).toFixed(2);
+    }
+    function syncArea(src) {
+        let sk = document.getElementById('qSKadi'), sf = document.getElementById('qSFeet'), sm = document.getElementById('qSMeter');
+        let val = parseFloat(src === 'sk' ? sk.value : src === 'sf' ? sf.value : sm.value);
+        if (!val || val === 0 || isNaN(val)) { sk.value = ""; sf.value = ""; sm.value = ""; return; }
+        let baseSqFt = (src === 'sk') ? val * 0.4356 : (src === 'sf') ? val : val * 10.76391;
+        if(src !== 'sk') sk.value = (baseSqFt / 0.4356).toFixed(2);
+        if(src !== 'sf') sf.value = baseSqFt.toFixed(2);
+        if(src !== 'sm') sm.value = (baseSqFt / 10.76391).toFixed(2);
+    }
+    function updateFromLagga() { let lEl = document.getElementById('laggaInput'), sEl = document.getElementById('scaleInput'); let val = parseFloat(lEl.value); if (!lEl.value || isNaN(val)) { sEl.value = ""; return; } sEl.value = parseFloat((val * 1.5 * val * 1.5).toFixed(4)); }
+    function updateFromSqFt() { let lEl = document.getElementById('laggaInput'), sEl = document.getElementById('scaleInput'); let val = parseFloat(sEl.value); if (!sEl.value || isNaN(val)) { lEl.value = ""; return; } lEl.value = parseFloat((Math.sqrt(val) / 1.5).toFixed(4)); }
+    const SQFT_PER_DECIMAL = 435.6, SQFT_PER_ACRE = 43560.0, SQFT_PER_HECTARE = 107639.104, SQFT_PER_SQKADI = 0.4356, SQFT_PER_SQMETER = 10.7639104; 
+    function toggleLandInputs() { let unit = document.getElementById('unitType').value; document.getElementById('singleInput').style.display = (unit === 'local_mixed' ? 'none' : 'block'); document.getElementById('mixedInput').style.display = (unit === 'local_mixed' ? 'grid' : 'none'); }
+    function resetAll() { document.getElementById('inAna').value = 16; document.querySelectorAll('input:not(#laggaInput):not(#scaleInput):not(#inAna)').forEach(el => el.value = ""); document.getElementById('resultBox').style.display = 'none'; document.getElementById('breakdownTable').innerHTML = ""; document.getElementById('landTotalRes').classList.add('hidden'); }
+    function formatArea(sqft, scale) { 
+        let lang = localStorage.getItem('skr_user_lang_final') || 'def', u = i18n[lang] || i18n.def;
+        let decTotal = sqft / SQFT_PER_DECIMAL, totalDhur = sqft / scale; 
+        let bigha = Math.floor(totalDhur / 400), rem1 = totalDhur % 400; 
+        let katha = Math.floor(rem1 / 20), rem2 = rem1 % 20; 
+        let dhur = Math.floor(rem2), dhurki = ((rem2 - dhur) * 20).toFixed(2), kanma = ((rem2 - dhur) * 16).toFixed(2); 
+        return { str: `${bigha} ${u.bg_label} - ${katha} ${u.kt_label} - ${dhur} ${u.dh_label}`, sub: `➜ ${kanma} ${u.opt_kw_sel} [या ${dhurki} ${u.opt_dk_sel}]`, dec: decTotal.toFixed(4), ac: (sqft / SQFT_PER_ACRE).toFixed(5), hec: (sqft / SQFT_PER_HECTARE).toFixed(6), sq: sqft.toFixed(2), kad: (sqft / SQFT_PER_SQKADI).toFixed(2), sqy: (sqft / 9.0).toFixed(2), sqm: (sqft / SQFT_PER_SQMETER).toFixed(2), acreSplit: `${Math.floor(decTotal / 100)} Ac - ${(decTotal % 100).toFixed(2)} Dec` }; 
+    }
+    function calculate() { 
+        let ana = parseFloat(document.getElementById('inAna').value) || 0; 
+        let shareVal = (ana/16) + (parseFloat(document.getElementById('inGanda').value)||0)/320 + (parseFloat(document.getElementById('inKauri').value)||0)/1280 + (parseFloat(document.getElementById('inKrant').value)||0)/3840 + (parseFloat(document.getElementById('inDant').value)||0)/11520 + (parseFloat(document.getElementById('inRen').value)||0)/230400 + (parseFloat(document.getElementById('inParas').value)||0)/3686400 + (parseFloat(document.getElementById('inKanwan').value)||0)/58982400; 
+        if (shareVal <= 0) return; 
+        let scale = parseFloat(document.getElementById('scaleInput').value); if(!scale || scale <= 0) return; 
+        let unit = document.getElementById('unitType').value, inputSqFt = 0; 
+        if (unit === 'local_mixed') { 
+            let dhurPart = (document.getElementById('microUnit').value === 'dhurki' ? (parseFloat(document.getElementById('inMicro').value)||0)/20 : (parseFloat(document.getElementById('inMicro').value)||0)/16);
+            inputSqFt = ((parseFloat(document.getElementById('inBigha').value)||0)*400 + (parseFloat(document.getElementById('inKatha').value)||0)*20 + (parseFloat(document.getElementById('inDhur').value)||0) + dhurPart) * scale; 
+        } else { 
+            let val = parseFloat(document.getElementById('singleInput').value); if (isNaN(val)) return; 
+            if (unit === 'sqft') inputSqFt = val; else if (unit === 'sqyard') inputSqFt = val * 9.0; else if (unit === 'sqkadi') inputSqFt = val * SQFT_PER_SQKADI; else if (unit === 'decimal') inputSqFt = val * SQFT_PER_DECIMAL; else if (unit === 'acre') inputSqFt = val * SQFT_PER_ACRE; else if (unit === 'hectare') inputSqFt = val * SQFT_PER_HECTARE; else if (unit === 'sqmeter') inputSqFt = val * SQFT_PER_SQMETER; 
+        } 
+        let fullSq = inputSqFt / shareVal, res = formatArea(inputSqFt, scale); 
+        document.getElementById('resultBox').style.display = 'block'; 
+        document.getElementById('resText').innerText = res.str; document.getElementById('resSub').innerText = res.sub; 
+        document.getElementById('rDec').innerText = res.dec; document.getElementById('rSqFt').innerText = res.sq; document.getElementById('rSqYard').innerText = res.sqy; document.getElementById('rSqMeter').innerText = res.sqm; document.getElementById('rAcre').innerText = res.ac; document.getElementById('rAcreSplit').innerText = res.acreSplit; document.getElementById('rHec').innerText = res.hec; document.getElementById('rSqKadi').innerText = res.kad; 
+        let lang = localStorage.getItem('skr_user_lang_final') || 'def', u = i18n[lang] || i18n.def;
+        let tableHTML = ""; let fracs = [ {n:u.lbl_an, v:1/16}, {n:u.lbl_gn, v:1/320}, {n:u.lbl_kr, v:1/1280}, {n:u.lbl_kt, v:1/3840}, {n:u.lbl_dn, v:1/11520}, {n:u.lbl_rn, v:1/230400}, {n:u.lbl_ps, v:1/3686400}, {n:u.lbl_kw, v:1/58982400} ]; 
+        let fullD = formatArea(fullSq, scale); 
+        tableHTML += `<tr class="hl-row"><td>${u.lbl_16ana}</td><td id="res_content_0"><div style="font-weight:900; color:#b71c1c; font-size:14px;">${fullD.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${fullD.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${fullD.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${fullD.kad} Sq.Kadi</span> | <span style="color:#c62828; font-weight:900;">${fullD.sq} Sq.Ft</span></div></td></tr>`;
+        fracs.forEach((f, idx) => { let area = fullSq * f.v; let d = formatArea(area, scale); let nameCell = `<div>1 ${f.n}</div><div style="margin-top:5px; display:flex; align-items:center; gap:4px;"><span style="font-weight:900; color:#00695c; font-size:11px;">x</span><input type="number" id="row_mul_${idx+1}" value="1" style="width:40px; padding:3px; text-align:center; border:2px solid #00695c; border-radius:4px; font-weight:900; font-size:12px;"><button onclick="updateRowCalc(${idx+1}, ${area})" style="background:#00695c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:10px; padding:4px 6px; font-weight:900;">OK</button></div>`; tableHTML += `<tr><td>${nameCell}</td><td id="res_content_${idx+1}"><div style="font-weight:900; color:#b71c1c; font-size:14px;">${d.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${d.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${d.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${fullD.kad} Sq.Kadi</span> | <span style="color:#c62828; font-weight:900;">${d.sq} Sq.Ft</span></div></td></tr>`; }); 
+        document.getElementById('breakdownTable').innerHTML = tableHTML; 
+    }
+    window.updateRowCalc = function(index, baseSqFt) { let mulVal = parseFloat(document.getElementById('row_mul_'+index).value) || 0; let scale = parseFloat(document.getElementById('scaleInput').value); if(!scale || scale <= 0) return; let d = formatArea(baseSqFt * mulVal, scale); document.getElementById('res_content_'+index).innerHTML = `<div style="font-weight:900; color:#b71c1c; font-size:14px;">${d.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${d.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${d.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${d.kad} Sq.Kadi</span> | <span style="color:#00695c; font-weight:900;">${d.sq} Sq.Ft</span></div>`; }
+    function addLandRow() { 
+        let div = document.createElement('div'); div.className = 'land-row'; 
+        let lang = localStorage.getItem('skr_user_lang_final') || 'def', labels = i18n[lang] || i18n.def;
+        div.innerHTML = `<select class="lr-op"><option value="1">+</option><option value="-1">-</option></select><div class="lr-box"><span class="lr-label la-bg">${labels.bg_label}</span><input type="number" class="lr-in l-b" placeholder="0"></div><div class="lr-box"><span class="lr-label la-kt">${labels.kt_label}</span><input type="number" class="lr-in l-k" placeholder="0"></div><div class="lr-box"><span class="lr-label la-dh">${labels.dh_label}</span><input type="number" class="lr-in l-d" placeholder="0"></div><div class="lr-box-large"><span class="lr-label la-mi">${labels.la_mi}</span><div class="micro-wrap"><input type="number" class="lr-in l-m" placeholder="0" style="width:100%;"><select class="micro-sel"><option value="kanwan">${labels.opt_kw_sel}</option><option value="dhurki">${labels.opt_dk_sel}</option></select></div></div><button class="lr-del" onclick="this.parentElement.remove()">✕</button>`; 
+        document.getElementById('landRowsArea').appendChild(div); 
+    }
+    function calcLandTotal() { 
+        let totalKan = 0; let scale = parseFloat(document.getElementById('scaleInput').value); if(!scale || scale <= 0) return;
+        document.querySelectorAll('.land-row').forEach(r => { let op = parseInt(r.querySelector('.lr-op').value); let b = parseFloat(r.querySelector('.l-b').value) || 0, k = parseFloat(r.querySelector('.l-k').value) || 0, d = parseFloat(r.querySelector('.l-d').value) || 0, m = parseFloat(r.querySelector('.l-m').value) || 0, t = r.querySelector('.micro-sel').value; totalKan += op * ((b*6400) + (k*320) + (d*16) + (t === 'dhurki' ? m*0.8 : m)); }); 
+        let totalSqFt = (totalKan / 16) * scale; let res = formatArea(Math.abs(totalSqFt), scale); let sign = totalKan < 0 ? "-" : "";
+        let htmlRes = `<div style="font-size:26px; font-weight:900; color:#b71c1c; margin-bottom:5px;">${sign}${res.str}</div><div style="font-size:18px; font-weight:900; color:#b71c1c; margin-bottom:12px;">${res.sub}</div><div style="border-top:2px solid #00796b; margin-top:10px; margin-bottom:15px;"></div><div class="grid-res" style="background:#fff; border:2px solid #bdbdbd; padding:12px; border-radius:8px;"><div><span class="res-label" id="l_dec">Decimal:</span> <span class="res-val c-dec">${res.dec}</span></div><div><span class="res-label" id="l_hec">Hectare:</span> <span class="res-val c-hec">${res.hec}</span></div><div style="grid-column: span 2;"><span class="res-label" id="l_acd">Acre-Dec:</span> <span class="res-val c-ac">${res.acreSplit}</span> <span style="font-size:11px; color:#444;">(Total: ${res.ac} Ac)</span></div><div style="border-top:1px dashed #999; padding-top:5px;"><span class="res-label" id="l_kad">Sq.Kadi:</span> <span class="res-val c-kad">${res.kad}</span></div><div style="border-top:1px dashed #999; padding-top:5px;"><span class="res-label" id="l_sqf">Sq.Ft:</span> <span class="res-val c-sq">${res.sq}</span></div><div style="border-top:1px dashed #999; padding-top:5px; grid-column: span 2;"><span class="res-label" id="l_gaj">Sq.Yard:</span> <span class="res-val" style="color:#d84315;">${res.sqy}</span></div><div style="border-top:1px dashed #999; padding-top:5px; grid-column: span 2;"><span class="res-label" id="l_sqm">Sq.Meter:</span> <span class="res-val" style="color:#004d40;">${res.sqm}</span></div></div>`;
+        document.getElementById('landTotalRes').innerHTML = htmlRes; document.getElementById('landTotalRes').classList.remove('hidden'); 
+    }
+    function updateLandAdderLabels() {
+        let lang = localStorage.getItem('skr_user_lang_final') || 'def';
+        let labels = i18n[lang] || i18n.def;
+        document.querySelectorAll('.land-row').forEach(row => {
+            row.querySelector('.la-bg').innerText = labels.bg_label; row.querySelector('.la-kt').innerText = labels.kt_label;
+            row.querySelector('.la-dh').innerText = labels.dh_label; row.querySelector('.la-mi').innerText = labels.la_mi || "Micro";
+            let ms = row.querySelector('.micro-sel'); ms.options[0].text = labels.opt_kw_sel; ms.options[1].text = labels.opt_dk_sel;
+        });
+    }
+
+    initSecurity();
+</script>
+</body>
+</html>
