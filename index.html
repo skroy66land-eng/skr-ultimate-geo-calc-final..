@@ -1,22 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SKR Ultimate Calculator Final</title>
+    <title>AERO Geo-Legal Skills - Ultimate Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
     <style>
         /* --- [V101 SECURITY STYLES - BOLD] --- */
         #licenseOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #001f3f; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #FFD700; text-align: center; }
-        .lic-box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; border: 4px solid #FFD700; width: 85%; max-width: 350px; backdrop-filter: blur(10px); }
+        .lic-box { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 15px; border: 4px solid #FFD700; width: 85%; max-width: 360px; backdrop-filter: blur(10px); }
         .lic-input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 3px solid #fff; text-align: center; font-weight: 900; font-size: 16px; }
         .lic-btn { width: 100%; padding: 12px; background: #FFD700; color: #000; border: 2px solid #fff; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 10px; font-size: 15px; box-shadow: 0 4px 0 #bfa15f; }
         .lic-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bfa15f; }
         .hidden { display: none !important; }
         #validityPeriod { width: 90%; padding: 10px; border-radius: 8px; font-weight: 900; margin-bottom: 10px; border: 3px solid #000; }
         .change-user-btn { background: transparent; border: 1px solid #fff; color: #fff; padding: 5px 10px; margin-top: 15px; border-radius: 5px; cursor: pointer; font-size: 11px; }
-        .lang-bar { display: flex; justify-content: flex-end; padding: 5px 10px; background: #002147; border-bottom: 1px solid #FFD700; }
-        .lang-select { background: #FFD700; color: #000; font-weight: 900; border-radius: 5px; font-size: 11px; padding: 2px 5px; border: none; outline: none; }
+        .lang-bar { display: flex; justify-content: flex-end; padding: 6px 12px; background: #002147; border-bottom: 2px solid #FFD700; }
+        .lang-select { background: #FFD700; color: #000; font-weight: 900; border-radius: 6px; font-size: 11.5px; padding: 3px 6px; border: none; outline: none; cursor: pointer; }
         #commChoiceBox { margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.3); padding-top: 15px; }
         .comm-btn { width: 48%; padding: 10px; border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 13px; border: none; margin: 2px; color: white; display: inline-block; }
         .btn-wa { background: #25D366; border: 2px solid #128c7e; box-shadow: 0 3px 0 #075e54; }
@@ -29,11 +32,11 @@
         body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 5px; color: #000; }
         .container { max-width: 100%; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); border: 3px solid #002147; border-top: 8px solid #002147; overflow: hidden; box-sizing: border-box; }
         @keyframes flashGold { 0% { background-color: #fff; } 50% { background-color: #ffd700; } 100% { background-color: #fff; } }
-        .header { text-align: center; padding: 15px; background: linear-gradient(180deg, #fff 0%, #e3f2fd 100%); border-bottom: 3px solid #002147; user-select: none; }
+        .header { text-align: center; padding: 15px; background: linear-gradient(180deg, #fff 0%, #e3f2fd 100%); border-bottom: 3.5px solid #FFD700; user-select: none; }
         .header-blink { animation: flashGold 0.2s ease-in-out; }
-        h2 { color: #002147; margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; text-shadow: 1px 1px 0px #ccc; }
-        h4 { color: #b71c1c; margin: 5px 0 0 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .iso-badge { display: inline-block; background: #002147; color: #fff; font-size: 11px; font-weight: bold; padding: 5px 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #FFD700; }
+        h2 { color: #b71c1c; margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; text-shadow: 0.5px 0.5px 0px #FFD700; letter-spacing: 0.5px; }
+        h4 { color: #002147; margin: 4px 0 0 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .iso-badge { display: inline-block; background: #002147; color: #FFD700; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 6px; margin-top: 8px; border: 1.5px solid #FFD700; }
         .content { padding: 10px; }
         .scale-box { background-color: #fff8e1; border: 3px solid #ffca28; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 5px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
         .scale-group { text-align: center; flex: 1; }
@@ -72,7 +75,7 @@
         .grid-res { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f5f5f5; padding: 10px; border-radius: 6px; text-align: left; font-size: 14px; border: 2px solid #bdbdbd; }
         .res-label { font-weight: 900; color: #424242; display: block; font-size: 12px; }
         .res-val { font-weight: 900; font-size: 15px; word-break: break-all; }
-        .c-dec { color: #2e7d32; } .c-sq { color: #c62828; }  .c-ac { color: #f57f17; }  .c-hec { color: #6a1b9a; } .c-kad { color: #00695c; } 
+        .c-dec { color: #2e7d32; } .c-sq { color: #c62828; } .c-ac { color: #f57f17; } .c-hec { color: #6a1b9a; } .c-kad { color: #00695c; } 
         .table-wrap { margin-top: 20px; border: 2px solid #9e9e9e; border-radius: 8px; overflow-x: auto; width: 100%; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 300px; }
         th { background: #37474f; color: white; padding: 10px; text-align: left; white-space: nowrap; border-bottom: 2px solid #000; font-weight: 900; }
@@ -80,8 +83,8 @@
         .hl-row { background-color: #fff9c4; font-weight: 900; color: #b71c1c; border-bottom: 2px solid #fbc02d; }
         .mini-tool { margin-top: 20px; background-color: #e0f7fa; border: 3px dashed #006064; border-radius: 8px; padding: 12px; width: 100%; box-sizing: border-box; }
         .mini-title { text-align: center; font-weight: 900; color: #006064; margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
-        .mini-flex { display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .mini-input { width: 100%; padding: 8px; border: 2px solid #00838f; border-radius: 6px; text-align: center; font-weight: 900; font-size: 14px; color: #004d40; box-sizing: border-box; background: #fff; }
+        .mini-flex { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+        .mini-input { width: 100%; padding: 8px 4px; border: 2px solid #00838f; border-radius: 6px; text-align: center; font-weight: 900; font-size: 14px; color: #004d40; box-sizing: border-box; background: #fff; }
         .footer-info { margin-top: 20px; font-size: 11px; color: #424242; text-align: center; background: #e3f2fd; padding: 10px; border-radius: 6px; border: 2px solid #90caf9; font-weight: 900; }
         .land-row { display: flex; gap: 3px; margin-bottom: 8px; align-items: flex-end; }
         .lr-op { width: 32px; height: 34px; background: #fff; font-weight: 900; border: 2px solid #00796b; border-radius: 6px; text-align: center; color: #004d40; margin-bottom: 1px; }
@@ -94,12 +97,74 @@
         .micro-wrap { display: flex; gap: 2px; width: 100%; align-items: center; }
         .micro-sel { font-size: 10px; border: 1px solid #00796b; border-radius: 4px; background: #b2dfdb; color: #004d40; font-weight: bold; width: 65px; height: 32px; text-align: center; }
         .land-res-box { margin-top: 15px; background: #fff; border: 3px solid #00796b; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* ADVANCED ZAMINDARI STYLES */
+        .zam-section { background:#fff; padding:12px; border-radius:8px; border:2px solid #ce93d8; margin-bottom:12px; box-sizing: border-box; width: 100%; }
+        .zam-title { font-size:13px; font-weight:900; color:#6a1b9a; text-align:center; margin-bottom:8px; border-bottom:1px dashed #ce93d8; padding-bottom:5px;}
+        .zam-sub-title { font-size:11px; font-weight:bold; color:#444; text-align:center; background:#f3e5f5; padding:5px; border-radius:4px; margin-bottom: 5px; margin-top: 8px; border:1px solid #ce93d8;}
+        .zam-grid-8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 100%; box-sizing: border-box; }
+        .zam-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 100%; box-sizing: border-box; }
+        .zam-item { display: flex; flex-direction: column; min-width: 0; }
+        .zam-item label { font-size:9px; color:#6a1b9a; font-weight:900; text-align:center; margin-bottom:2px;}
+        .zam-item input { width: 100%; padding:8px 4px; border:2px solid #ab47bc; border-radius:6px; text-align:center; font-weight:900; font-size:13px; color:#000; box-sizing: border-box; }
+        .zam-item select { width: 100%; padding:6px 2px; border:2px solid #ab47bc; border-radius:6px; text-align:center; font-weight:900; font-size:10px; color:#000; box-sizing: border-box; background: #e1bee7;}
+        .zam-res-box { background:#fff; border:3px solid #8e24aa; border-radius:12px; padding:0; margin-top:15px; text-align:center; box-sizing: border-box; width: 100%; box-shadow: 0 6px 15px rgba(106, 27, 154, 0.2); overflow: hidden;}
+        .zam-res-title { font-size:15px; font-weight:900; color:#fff; background:#4a148c; padding: 10px; border-bottom: 3px solid #FFD700; text-transform:uppercase;}
+
+        /* --- [PERFECT A4 REPORT MODAL: FLUID HORIZONTAL SWIPING] --- */
+        #reportModal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(0,0,0,0.88); z-index: 25000; overflow-y: auto; overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; box-sizing: border-box; padding: 0;
+        }
+        .a4-outer-container { display: block; width: max-content; min-width: 100%; padding: 12px 14px 90px 14px; box-sizing: border-box; }
+        .a4-wrapper { width: 794px; margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); overflow: visible; }
+        .a4-sheet { width: 794px; min-height: 1123px; background: #ffffff; color: #000; padding: 30px 32px; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; position: relative; margin: 0 auto; }
+        .a4-header { border-bottom: 3.5px solid #FFD700; padding-bottom: 10px; margin-bottom: 12px; text-align: center; }
+        .a4-header h1 { margin: 0; font-size: 22px; font-weight: 900; color: #b71c1c; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 0.5px 0.5px 0px #FFD700; }
+        .a4-header h3 { margin: 3px 0; font-size: 13.5px; font-weight: 900; color: #001f3f; }
+        .a4-header p { margin: 2px 0; font-size: 10.5px; font-weight: bold; color: #333; }
+        .a4-badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 6px; }
+        .a4-badge { background: #001f3f; color: #FFD700; font-size: 10px; font-weight: 900; padding: 4px 10px; border-radius: 4px; border: 1.2px solid #FFD700; }
+        
+        .a4-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #fbfbfb; border: 1.5px solid #001f3f; border-radius: 6px; padding: 8px; margin-bottom: 12px; }
+        .a4-meta-item { display: flex; flex-direction: column; }
+        .a4-meta-title { font-size: 9.5px; font-weight: 900; color: #001f3f; text-transform: uppercase; margin-bottom: 2px; }
+        .a4-meta-val { border: 1px solid #aaa; border-radius: 4px; padding: 4px 6px; font-size: 11.5px; font-weight: 800; text-align: center; background: #fff; min-height: 24px; line-height: 24px; outline: none; }
+        .a4-meta-val:focus { border-color: #001f3f; background: #fffde7; }
+        
+        .a4-card { border: 1.5px solid #001f3f; border-radius: 6px; margin-bottom: 10px; overflow: hidden; background: #fff; }
+        .a4-card-title { background: #001f3f; color: #FFD700; font-size: 11.5px; font-weight: 900; padding: 5px 8px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .a4-card-body { padding: 8px 10px; font-size: 11.5px; outline: none; }
+        
+        .a4-table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 5px; }
+        .a4-table th { background: #37474f; color: #fff; padding: 5px 6px; font-weight: 900; border: 1px solid #222; text-align: left; }
+        .a4-table td { padding: 4.5px 6px; border: 1px solid #ccc; font-weight: 700; color: #000; }
+        
+        /* FOOTER & ROUND DIGITAL STAMP */
+        .a4-footer { margin-top: 30px; border-top: 3px solid #FFD700; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; outline: none; }
+        .digital-seal-container { text-align: center; width: 175px; display: flex; flex-direction: column; align-items: center; outline: none; user-select: text; }
+        .digital-seal { width: 135px; height: 135px; border: 3px double #002147; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: #fff; color: #002147; box-sizing: border-box; padding: 4px; box-shadow: 0 0 4px rgba(0,33,71,0.15); outline: none; cursor: text; }
+        .seal-inner { width: 100%; height: 100%; border: 1.5px dashed #002147; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 3px; box-sizing: border-box; outline: none; }
+        .seal-top { font-size: 7.2px; font-weight: 900; letter-spacing: 0.4px; text-transform: uppercase; color: #b71c1c; outline: none; }
+        .seal-center { font-size: 8.8px; font-weight: 900; color: #002147; margin: 2px 0; line-height: 1.15; border-top: 1px solid #002147; border-bottom: 1px solid #002147; padding: 2px 4px; outline: none; }
+        .seal-name { font-size: 10px; font-weight: 900; color: #b71c1c; letter-spacing: 0.6px; outline: none; }
+        .seal-bottom { font-size: 6.8px; font-weight: 800; color: #002147; margin-top: 2px; outline: none; }
+        .verified-label { font-size: 10px; font-weight: 900; color: #002147; margin-top: 4px; letter-spacing: 0.5px; outline: none; }
+
+        .report-controls-bar { position: fixed; bottom: 0; left: 0; right: 0; width: 100vw; background: #ffffff; padding: 9px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 3.5px solid #FFD700; z-index: 26000; box-shadow: 0 -4px 12px rgba(0,0,0,0.25); box-sizing: border-box; }
+        .report-opt-box { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 11.5px; color: #002147; cursor: pointer; }
+        .report-opt-box input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: #002147; }
+        .btn-act-down { background: #002147; color: #FFD700; border: 2px solid #FFD700; padding: 9px 20px; font-size: 13.5px; font-weight: 900; border-radius: 30px; cursor: pointer; }
+        .btn-act-close { background: #c62828; color: #fff; border: 2px solid #b71c1c; padding: 9px 16px; font-size: 13px; font-weight: 900; border-radius: 30px; cursor: pointer; }
     </style>
 </head>
 <body>
+
 <div id="licenseOverlay">
     <div class="lic-box" id="loginBox">
-        <h2 id="l_h2">SKR GEO-LEGAL</h2>
+        <h2 id="l_h2">🏛️ AERO GEO-LEGAL SKILLS</h2>
+        <p style="font-size:11px; margin:3px 0 8px 0; color:#ffcdd2; font-weight:bold;">【 Autonomous Tech-Legal &amp; Skill Entity 】</p>
         <p id="l_p">SECURE LOGIN</p>
         <input type="number" id="userMobile" class="lic-input" placeholder="Enter Mobile Number">
         <button class="lic-btn" onclick="checkUser()" id="l_btn">LOGIN</button>
@@ -144,24 +209,38 @@
         <button class="lic-btn" style="background:#555; margin-top:10px; border-color:#333;" onclick="closeAdmin()">CLOSE</button>
     </div>
 </div>
+
 <div id="toastBox"></div>
+
 <div class="container">
     <div class="lang-bar">
         <select class="lang-select" id="langSelector" onchange="changeLanguage()">
             <option value="def">Default (English/हिन्दी)</option>
             <option value="en">English</option>
+            <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+            <option value="gu">ગુજરાતી (Gujarati)</option>
             <option value="bn">বাংলা (Bengali)</option>
             <option value="mr">मराठी (Marathi)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+            <option value="ori">ଓଡ଼ିଆ (Odia)</option>
+            <option value="as">অসমীয়া (Assamese)</option>
+            <option value="ur">اردو (Urdu)</option>
             <option value="bh">भोजपुरी (Bhojpuri)</option>
             <option value="mai">मैथिली (Maithili)</option>
             <option value="kai">कैथी (Kaithi)</option>
-            <option value="ori">ଓଡ଼ିଆ (Odia)</option>
         </select>
     </div>
     <div class="header" id="appHeader" onclick="handleHeaderTap()">
-        <h2 id="m_h2">SKR Geo-Legal Associates</h2>
-        <h4 id="m_h4">Smart Solutions & Digital Documentation</h4>
-        <div class="iso-badge" id="iso_b">ISO 9001:2015 & MSME REGD.</div>
+        <h2 id="m_h2">🏛️ AERO GEO-LEGAL SKILLS</h2>
+        <h4 id="m_h4">【 Autonomous Tech-Legal &amp; Skill Entity 】</h4>
+        <div style="margin: 4px 0; font-size: 8.5px; font-weight: 800; color: #b71c1c; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
+            <span>🎖️ Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)</span>
+            <span>🆔 Code: BR-30-0077516 | ISO 9001:2015</span>
+        </div>
+        <div class="iso-badge" id="iso_b">🖋️ (SKR Geo-Legal Associates)</div>
     </div>
     <div class="content">
         <div class="scale-box">
@@ -235,21 +314,26 @@
             <div class="clickable-header" id="b_title" onclick="toggleTable()">🔻 कुल 16 आना का विवरण (Full Property Logic)</div>
             <table id="breakdownTable" class="hidden"></table>
         </div>
+
+        <!-- 4-UNIT QUICK CONVERTER -->
         <button class="lic-btn" style="background:#00838f; color:#fff; margin-top:15px; border-color:#006064; box-shadow:0 4px 0 #004d40;" onclick="toggleConverter()" id="btn_toggle_conv">📏 लंबाई एवं क्षेत्रफल परिवर्तक (Unit Converter)</button>
         <div id="converterContainer" class="mini-tool hidden" style="margin-top:10px; border-color:#00838f; background:#e0f7fa;">
-            <div class="mini-title" id="c_title_len">🔗 त्वरित लंबाई परिवर्तक (Length Converter)</div>
+            <div class="mini-title" id="c_title_len">🔗 त्वरित लंबाई परिवर्तक (Length Converter - 4 Units)</div>
             <div class="mini-flex">
                 <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_kadi">कड़ी (Kadi)</label><input type="number" id="qKadi" class="mini-input" placeholder="0" oninput="syncLen('k')"></div>
                 <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_feet">फिट (Feet)</label><input type="number" id="qFeet" class="mini-input" placeholder="0" oninput="syncLen('f')"></div>
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_yard">गज (Yard)</label><input type="number" id="qYard" class="mini-input" placeholder="0" oninput="syncLen('y')"></div>
                 <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_meter">मीटर (Meter)</label><input type="number" id="qMeter" class="mini-input" placeholder="0" oninput="syncLen('m')"></div>
             </div>
-            <div class="mini-title" style="margin-top:15px;" id="c_title_area">🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter)</div>
+            <div class="mini-title" style="margin-top:15px;" id="c_title_area">🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter - 4 Units)</div>
             <div class="mini-flex">
                 <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqk">वर्ग कड़ी (Sq.Kadi)</label><input type="number" id="qSKadi" class="mini-input" placeholder="0" oninput="syncArea('sk')"></div>
                 <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqf_l">वर्ग फिट (Sq.Ft)</label><input type="number" id="qSFeet" class="mini-input" placeholder="0" oninput="syncArea('sf')"></div>
+                <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqy_l">वर्ग गज (Sq.Yard)</label><input type="number" id="qSYard" class="mini-input" placeholder="0" oninput="syncArea('sy')"></div>
                 <div style="flex:1;"><label style="font-size:9px; color:#006064; font-weight:900; text-align:center; display:block;" id="l_sqm_l">वर्ग मीटर (Sq.Mtr)</label><input type="number" id="qSMeter" class="mini-input" placeholder="0" oninput="syncArea('sm')"></div>
             </div>
         </div>
+
         <button class="lic-btn" style="background:#009688; color:#fff; margin-top:15px; border-color:#00796b; box-shadow:0 4px 0 #004d40;" onclick="toggleLandCalc()" id="b_toggle">➕ जमीन जोड़ / घटाव (Land Calculator)</button>
         <div id="landCalcContainer" class="mini-tool hidden" style="margin-top:10px; border-color:#009688; background:#e0f2f1; padding:8px;">
             <div class="mini-title" style="color:#00796b; font-size:14px; margin-bottom:12px;" id="ad_title">जमीन जोड़ / घटाव (Land Adder)</div>
@@ -258,9 +342,220 @@
             <button class="lic-btn" style="background:#004d40; color:white; font-size:12px; padding:8px; width:48%; display:inline-block; border:none; box-shadow:0 3px 0 #00251a;" onclick="calcLandTotal()" id="b_tot">= कुल (Total)</button>
             <div id="landTotalRes" class="land-res-box hidden"></div>
         </div>
-        <div class="footer-info"><b>SKR GEO-LEGAL ASSOCIATES</b><br>Smart Solutions & Digital Documentation</div>
+        
+        <!-- ADVANCED ZAMINDARI & LAND MODULE -->
+        <button class="lic-btn" style="background:#4a148c; color:#fff; margin-top:15px; border-color:#311b92; box-shadow:0 4px 0 #1a237e;" onclick="toggleAdvZamindari()" id="b_toggle_adv_zam">⚖️ एडवांस कच्चा-पक्का एवं रकबा मास्टर</button>
+        <div id="advZamindariContainer" class="mini-tool hidden" style="margin-top:10px; border-color:#4a148c; background:#f3e5f5; padding:8px;">
+            <div class="mini-title" style="color:#4a148c; font-size:14px; margin-bottom:12px;">एडवांस जमींदारी एवं रकबा विश्लेषण</div>
+            
+            <div class="zam-section">
+                <div class="zam-title">चरण 1: गाँव का कुल रकबा (मुसल्लम 16 आना) <br><span style="font-size:10px; color:#888;">(वैकल्पिक - यदि रकबा निकालना हो)</span></div>
+                <div class="zam-grid-4">
+                    <div class="zam-item"><label>बीघा</label><input type="number" id="z_v_b" placeholder="0"></div>
+                    <div class="zam-item"><label>कट्ठा</label><input type="number" id="z_v_k" placeholder="0"></div>
+                    <div class="zam-item"><label>धुर</label><input type="number" id="z_v_d" placeholder="0"></div>
+                    <div class="zam-item">
+                        <label>माइक्रो यूनिट</label>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <input type="number" id="z_v_m" placeholder="0" style="width:100%;">
+                            <select id="z_v_type">
+                                <option value="kanwan">कनवाँ</option>
+                                <option value="dhurki">धुरकी</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zam-section" style="background:#e8eaf6; border-color:#3f51b5;">
+                <div class="zam-title" style="color:#3f51b5; border-color:#3f51b5;">चरण 2: विक्रेता का कुल हिस्सा (पक्का)</div>
+                <div class="zam-sub-title">आना-गंडा दर्ज करें</div>
+                <div class="zam-grid-8">
+                    <div class="zam-item"><label>आना</label><input type="number" id="z_s_ana" placeholder="0"></div>
+                    <div class="zam-item"><label>गंडा</label><input type="number" id="z_s_gan" placeholder="0"></div>
+                    <div class="zam-item"><label>कौड़ी</label><input type="number" id="z_s_kau" placeholder="0"></div>
+                    <div class="zam-item"><label>क्रन्त</label><input type="number" id="z_s_kra" placeholder="0"></div>
+                    <div class="zam-item"><label>दन्त</label><input type="number" id="z_s_dan" placeholder="0"></div>
+                    <div class="zam-item"><label>रेन</label><input type="number" id="z_s_ren" placeholder="0"></div>
+                    <div class="zam-item"><label>परस</label><input type="number" id="z_s_par" placeholder="0"></div>
+                    <div class="zam-item"><label>कनवाँ</label><input type="number" id="z_s_kan" placeholder="0"></div>
+                </div>
+                
+                <div class="zam-sub-title">या रकबा दर्ज करें</div>
+                <div class="zam-grid-4">
+                    <div class="zam-item"><label>बीघा</label><input type="number" id="z_s_b" placeholder="0"></div>
+                    <div class="zam-item"><label>कट्ठा</label><input type="number" id="z_s_k" placeholder="0"></div>
+                    <div class="zam-item"><label>धुर</label><input type="number" id="z_s_d" placeholder="0"></div>
+                    <div class="zam-item">
+                        <label>माइक्रो यूनिट</label>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <input type="number" id="z_s_m" placeholder="0" style="width:100%;">
+                            <select id="z_s_type">
+                                <option value="kanwan">कनवाँ</option>
+                                <option value="dhurki">धुरकी</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zam-section" style="background:#e8f5e9; border-color:#4caf50;">
+                <div class="zam-title" style="color:#2e7d32; border-color:#4caf50;">चरण 3: बिक्री / हस्तांतरण (क्रेता को मिला)</div>
+                <div class="zam-sub-title">कच्चा आना-गंडा दर्ज करें</div>
+                <div class="zam-grid-8">
+                    <div class="zam-item"><label>आना</label><input type="number" id="z_b_ana" placeholder="0"></div>
+                    <div class="zam-item"><label>गंडा</label><input type="number" id="z_b_gan" placeholder="0"></div>
+                    <div class="zam-item"><label>कौड़ी</label><input type="number" id="z_b_kau" placeholder="0"></div>
+                    <div class="zam-item"><label>क्रन्त</label><input type="number" id="z_b_kra" placeholder="0"></div>
+                    <div class="zam-item"><label>दन्त</label><input type="number" id="z_b_dan" placeholder="0"></div>
+                    <div class="zam-item"><label>रेन</label><input type="number" id="z_b_ren" placeholder="0"></div>
+                    <div class="zam-item"><label>परस</label><input type="number" id="z_b_par" placeholder="0"></div>
+                    <div class="zam-item"><label>कनवाँ</label><input type="number" id="z_b_kan" placeholder="0"></div>
+                </div>
+
+                <div class="zam-sub-title" style="background:#e1bee7; border-color:#ba68c8; color:#4a148c;">या पक्का आना-गंडा दर्ज करें (गाँव के सापेक्ष)</div>
+                <div class="zam-grid-8">
+                    <div class="zam-item"><label>आना</label><input type="number" id="z_p_ana" placeholder="0"></div>
+                    <div class="zam-item"><label>गंडा</label><input type="number" id="z_p_gan" placeholder="0"></div>
+                    <div class="zam-item"><label>कौड़ी</label><input type="number" id="z_p_kau" placeholder="0"></div>
+                    <div class="zam-item"><label>क्रन्त</label><input type="number" id="z_p_kra" placeholder="0"></div>
+                    <div class="zam-item"><label>दन्त</label><input type="number" id="z_p_dan" placeholder="0"></div>
+                    <div class="zam-item"><label>रेन</label><input type="number" id="z_p_ren" placeholder="0"></div>
+                    <div class="zam-item"><label>परस</label><input type="number" id="z_p_par" placeholder="0"></div>
+                    <div class="zam-item"><label>कनवाँ</label><input type="number" id="z_p_kan" placeholder="0"></div>
+                </div>
+                
+                <div class="zam-sub-title">या रकबा दर्ज करें</div>
+                <div class="zam-grid-4">
+                    <div class="zam-item"><label>बीघा</label><input type="number" id="z_b_b" placeholder="0"></div>
+                    <div class="zam-item"><label>कट्ठा</label><input type="number" id="z_b_k" placeholder="0"></div>
+                    <div class="zam-item"><label>धुर</label><input type="number" id="z_b_d" placeholder="0"></div>
+                    <div class="zam-item">
+                        <label>माइक्रो यूनिट</label>
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <input type="number" id="z_b_m" placeholder="0" style="width:100%;">
+                            <select id="z_b_type">
+                                <option value="kanwan">कनवाँ</option>
+                                <option value="dhurki">धुरकी</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="lic-btn" style="background:#000; color:#FFD700; font-size:16px; padding:12px; width:100%; border:2px solid #FFD700; box-shadow:0 4px 0 #555;" onclick="calcAdvZamindari()">⚡ संपूर्ण विश्लेषण निकालें (Analyze)</button>
+            <div id="advZamRes" class="zam-res-box hidden"></div>
+        </div>
+
+        <button class="lic-btn" style="background:#b71c1c; color:#fff; margin-top:20px; border-color:#7f0000; box-shadow:0 4px 0 #4a0000; font-size:16px;" onclick="openA4ReportModal()">📄 A4 आधिकारिक पर्चा / रिपोर्ट (A4 Report)</button>
+
+        <div class="footer-info">
+            <b style="color: #b71c1c; font-size: 13.5px;">🏛️ AERO GEO-LEGAL SKILLS</b><br>
+            <span style="color: #002147; font-weight: 800;">【 Autonomous Tech-Legal &amp; Skill Entity 】</span><br>
+            <span style="color: #444; font-size: 10px;">🎖️ Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise) | 🆔 Code: BR-30-0077516 | ISO 9001:2015</span><br>
+            <span style="color: #b08d57; font-size: 11px; font-weight: 800;">🖋️ (SKR Geo-Legal Associates)</span>
+        </div>
     </div>
 </div>
+
+<!-- ================= [PERFECT A4 EDITABLE REPORT MODAL: FLUID HORIZONTAL SWIPING] ================= -->
+<div id="reportModal">
+    <div class="a4-outer-container" id="a4OuterScroll">
+        <div class="a4-wrapper">
+            <div id="a4Sheet" class="a4-sheet">
+                <!-- BRANDED A4 HEADER -->
+                <div class="a4-header" contenteditable="true">
+                    <h1>🏛️ AERO GEO-LEGAL SKILLS</h1>
+                    <h3 style="margin: 3px 0; font-size: 13.5px; font-weight: 900; color: #002147;">【 Autonomous Tech-Legal &amp; Skill Entity 】</h3>
+                    <p style="margin: 3px 0; font-size: 10px; font-weight: 800; color: #b71c1c;">
+                        🎖️ Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise) | 🆔 Code: BR-30-0077516 | ISO 9001:2015
+                    </p>
+                    <p style="margin: 2px 0; font-size: 11px; font-weight: 900; color: #b08d57;">
+                        🖋️ (SKR Geo-Legal Associates)
+                    </p>
+                    <div class="a4-badge-row">
+                        <span class="a4-badge">भू-अभिलेख रकबा संगणना प्रपत्र</span>
+                        <span class="a4-badge">LEGAL REVENUE REPORT</span>
+                        <span class="a4-badge">दिनांक: <span id="repDate"></span></span>
+                    </div>
+                </div>
+
+                <!-- Client & Property Details: Pure contenteditable blocks to prevent input clipping -->
+                <div class="a4-meta-grid">
+                    <div class="a4-meta-item"><span class="a4-meta-title">जिला (District):</span><div class="a4-meta-val" contenteditable="true" id="repDist">दरभंगा</div></div>
+                    <div class="a4-meta-item"><span class="a4-meta-title">अंचल (Anchal):</span><div class="a4-meta-val" contenteditable="true" id="repAnchal">सदर</div></div>
+                    <div class="a4-meta-item"><span class="a4-meta-title">राजस्व मौजा (Mauza):</span><div class="a4-meta-val" contenteditable="true" id="repMauza">मौजा नाम दर्ज करें</div></div>
+                    <div class="a4-meta-item"><span class="a4-meta-title">थाना संख्या (Thana No):</span><div class="a4-meta-val" contenteditable="true" id="repThana">थाना संख्या</div></div>
+                    <div class="a4-meta-item"><span class="a4-meta-title">खाता संख्या (Khata):</span><div class="a4-meta-val" contenteditable="true" id="repKhata">खाता संख्या</div></div>
+                    <div class="a4-meta-item"><span class="a4-meta-title">खेसरा संख्या (Khesra):</span><div class="a4-meta-val" contenteditable="true" id="repKhesra">खेसरा संख्या</div></div>
+                    <div class="a4-meta-item" style="grid-column: span 3;"><span class="a4-meta-title">रैयत / हितबद्ध पक्षकार का नाम (Owner / Party Name):</span><div class="a4-meta-val" contenteditable="true" id="repOwner" style="text-align:left; padding-left:10px;">श्री / श्रीमती का नाम</div></div>
+                </div>
+
+                <!-- Calculation Summary Card -->
+                <div class="a4-card">
+                    <div class="a4-card-title">1. पैमाना (लग्गा) एवं मुख्य रकबा विवरण (Scale &amp; Area Calculation)</div>
+                    <div class="a4-card-body" id="repCalcBody" contenteditable="true"></div>
+                </div>
+
+                <!-- 16 Ana Breakdown Summary (OPTIONAL) -->
+                <div class="a4-card" id="repTableCard" style="display:none;">
+                    <div class="a4-card-title">2. मुसल्लम 16 आना हिस्सा विवरण (Full Property 16 Ana Breakdown)</div>
+                    <div class="a4-card-body" id="repTableBody" contenteditable="true"></div>
+                </div>
+
+                <!-- Extra Calculation Notes Card -->
+                <div class="a4-card" id="repLandAdderCard">
+                    <div class="a4-card-title">3. विशेष कैफियत एवं विवरण (Special Remarks &amp; Calculation Notes)</div>
+                    <div class="a4-card-body" id="repLandAdderBody" contenteditable="true">
+                        <p style="margin:0; font-size:11px; color:#333;">यह संगणना अभिलेखीय साक्ष्यों एवं प्रविष्टियों के आधार पर तैयार की गई है। आवश्यकतानुसार इस विवरण में अतिरिक्त तथ्य जोड़े जा सकते हैं...</p>
+                    </div>
+                </div>
+
+                <!-- BRANDED A4 FOOTER (ENGLISH & EDITABLE ROUND DIGITAL STAMP) -->
+                <div class="a4-footer" contenteditable="true">
+                    <div style="line-height:1.55; text-align:left;" contenteditable="true">
+                        <b style="color: #b71c1c; font-size: 13.5px; letter-spacing:0.3px;">AERO GEO-LEGAL SKILLS</b><br>
+                        <span style="font-weight: 900; color: #002147; font-size: 12px;">Technical Advisor: S. K. ROY</span><br>
+                        <span style="font-size: 10.5px; color: #333; font-weight:700;">Digital Land &amp; Technical Consultant</span><br>
+                        <span style="font-size: 10.5px; color: #444; font-weight:800;">📞 Phone / WhatsApp: +91 62002 63472</span>
+                    </div>
+                    
+                    <div class="digital-seal-container" id="digitalSealBox" contenteditable="true">
+                        <div class="digital-seal" contenteditable="true" title="Click text to edit or select to delete">
+                            <div class="seal-inner" contenteditable="true">
+                                <div class="seal-top">AERO GEO-LEGAL SKILLS</div>
+                                <div class="seal-center">✔ DIGITALLY<br>VERIFIED</div>
+                                <div class="seal-name">S. K. ROY</div>
+                                <div class="seal-bottom">TECHNICAL ADVISOR</div>
+                            </div>
+                        </div>
+                        <div class="verified-label" contenteditable="true">
+                            DIGITALLY VERIFIED<br>
+                            <span style="font-size: 8.5px; font-weight: 700; color: #555;">Technical Authentication</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Bottom Controls Bar: Always Pinned to Screen Bottom -->
+    <div class="report-controls-bar">
+        <label class="report-opt-box">
+            <input type="checkbox" id="chkShow16Ana" onchange="toggleReport16Ana(this.checked)">
+            <span>16 आना विवरण तालिका शामिल करें</span>
+        </label>
+        <label class="report-opt-box">
+            <input type="checkbox" id="chkShowStamp" checked onchange="toggleReportStamp(this.checked)">
+            <span>डिजिटल मोहर (Stamp)</span>
+        </label>
+        <div style="display:flex; gap:8px;">
+            <button class="btn-act-down" onclick="downloadA4Document()">⬇️ A4 पर्चा डाउनलोड करें</button>
+            <button class="btn-act-close" onclick="closeA4ReportModal()">✕ बंद करें</button>
+        </div>
+    </div>
+</div>
+
 <script>
     /* --- [१. बुनियादी सेटिंग्स] --- */
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJ-MQyHBEukx6t03zFAeApGKpB7CbIDwU64kXeDh5R1ZJ6MquuavVqwY2hW9b5oGbv/exec";
@@ -312,7 +607,6 @@
         currentUser = localStorage.getItem('skr_final_user');
         document.getElementById('deviceIdDisplay').innerText = deviceId;
         
-        // मास्टर लॉगिन चेक
         if (currentUser === MASTER_NUMBER) {
             unlockApp(true);
             finalizeInit();
@@ -321,7 +615,6 @@
 
         let expiry = localStorage.getItem('skr_final_expiry');
         
-        // ऑटो रिकवरी (अगर डेटा डिलीट हुआ हो)
         if (!expiry) {
             let rec = await recoverFromCloud();
             if (rec && parseInt(rec.exp) > Date.now()) {
@@ -332,10 +625,14 @@
                 currentUser = rec.mob;
                 expiry = rec.exp;
                 showToast("✅ लाइसेंस बहाल (Recovered)");
+                
+                if (currentUser === MASTER_NUMBER) {
+                   unlockApp(true);
+                   return;
+                }
             }
         }
 
-        // समय चेक
         if (expiry && parseInt(expiry) > Date.now()) {
             unlockApp();
             let d = new Date(parseInt(expiry));
@@ -389,7 +686,7 @@
         }
     }
 
-    /* --- [६. मैसेजिंग और एडमिन] --- */
+    /* --- [६. ब्रांडेड मैसेजिंग और एडमिन] --- */
     let selectedDuration = 1;
     function prepareRequest(months) { 
         selectedDuration = months; 
@@ -398,7 +695,8 @@
     }
 
     function sendRequest(method) {
-        let msg = `🚩 *एसकेआर जिओ लीगल एसोसिएट्स* 🚩\n\nविषय: *सॉफ्टवेयर एक्टिवेशन हेतु कानूनी अनुरोध*\n\nश्रीमान, मैं अपनी स्वेच्छा से आपकी डिजिटल सेवा लेना चाहता हूँ। कृपया मेरे डिवाइस को सक्रिय करें।\n\n📱 मोबाइल: ${currentUser}\n🆔 डिवाइस आईडी: ${deviceId}\n🔗 फिंगरप्रिंट: ${hpid}\n📅 प्लान: ${selectedDuration==12?"1 Year":selectedDuration+" Month"}\n\nधन्यवाद।`;
+        let plan = selectedDuration == 12 ? "1 Year" : selectedDuration + " Month";
+        let msg = `🏛️ *AERO GEO-LEGAL SKILLS*\n【 Autonomous Tech-Legal & Skill Entity 】\n🖋️ _(SKR Geo-Legal Associates)_\n🎖️ _Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)_\n🆔 _Code: BR-30-0077516 | ISO 9001:2015_\n\n━━━━━━━━━━━━━━━━━━━━━\n📑 *APPLICATION FOR DIGITAL ACCESS*\n━━━━━━━━━━━━━━━━━━━━━\n\nTo: *AERO GEO-LEGAL SKILLS*\n\nSir, I hereby voluntarily request the activation of single-device digital calculator access under your official tech-legal terms.\n\n📱 *User Mobile:* ${currentUser}\n🆔 *Device ID:* ${deviceId}\n🔒 *HPID:* ${hpid}\n📅 *Selected Plan:* ${plan}\n\nKindly grant the authorized activation OTP.\n\nSubmitted By:\n*Applicant / User*`;
         let encoded = encodeURIComponent(msg);
         if (method === 'wa') window.open(`https://wa.me/91${MASTER_NUMBER}?text=${encoded}`, '_blank');
         else window.open(`sms:${MASTER_NUMBER}?body=${encoded}`, '_blank');
@@ -409,23 +707,32 @@
         let cotp = document.getElementById('generatedCodeDisplay').innerText;
         let cdid = document.getElementById('clientDeviceId').value;
         let cexp = document.getElementById('validityPeriod').value;
-        let d = new Date(); d.setDate(d.getDate() + (cexp*30));
-        let msg = `🎊 *बधाई हो! आपकी सेवा सक्रिय है* 🎊\n\n*SKR GEO-LEGAL ASSOCIATES*\nआपका सॉफ्टवेयर सफलतापूर्वक अपडेट कर दिया गया है।\n\n🔑 कोड: *${cotp}*\n🆔 डिवाइस आईडी: ${cdid}\n⌛ आखरी तिथि: ${d.toLocaleDateString()}\n\nहमारी सेवा चुनने के लिए धन्यवाद। शुभकामनाएँ!`;
+        let days = (cexp == "12") ? 365 : (parseInt(cexp) * 30);
+        let d = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+        let msg = `🎊 *WELCOME TO AERO GEO-LEGAL SKILLS* 🎊\n【 Autonomous Tech-Legal & Skill Entity 】\n🖋️ _(SKR Geo-Legal Associates)_\n🎖️ _Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)_\n🆔 _Code: BR-30-0077516 | ISO 9001:2015_\n\n━━━━━━━━━━━━━━━━━━━━━\n🔑 *OFFICIAL ACTIVATION CREDENTIALS*\n━━━━━━━━━━━━━━━━━━━━━\n\nDear Professional,\nWelcome to *AERO GEO-LEGAL SKILLS*! Thank you for choosing our technical & digital calculator services.\n\nYour application has been verified and your secure device access is now successfully activated:\n\n🔑 *Activation Code:* *${cotp}*\n🆔 *Authorized Terminal:* ${cdid}\n⌛ *Valid Upto:* ${d.toLocaleDateString('hi-IN')}\n\n📌 *Note:* Enter this activation code into your app to unlock full professional features. This license is non-transferable and securely bound to this device.\n\n━━━━━━━━━━━━━━━━━━━━━\n*Technical Advisor: S. K. ROY*\n📞 *Ph: +91 62002 63472*\n━━━━━━━━━━━━━━━━━━━━━`;
         let encoded = encodeURIComponent(msg);
         if (method === 'wa') window.open(`https://wa.me/91${cmob}?text=${encoded}`, '_blank');
         else window.open(`sms:${cmob}?body=${encoded}`, '_blank');
     }
 
-    /* --- [७. कैलकुलेटर फंक्शन्स - यथावत] --- */
+    /* --- [७. कैलकुलेटर फंक्शन्स एवं संपूर्ण भाषा डिक्शनरी] --- */
     const i18n = {
-        def: { bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना/Ana", lbl_gn: "गंडा/Ganda", lbl_kr: "कौड़ी/Kauri", lbl_kt: "क्रन्त/Krant", lbl_dn: "दन्त/Dant", lbl_rn: "रेन/Ren", lbl_ps: "परस/Paras", lbl_kw: "कनवाँ/Kanwan", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (Sq.Ft)", s_1: "1. हिस्सा / जमींदारी विवरण (Share Details):", r_head: "📊 परिणाम (Result)", r_ent: "आपका दर्ज किया गया रकबा: (Your Entered Area:)", s_2: "2. रकबा की इकाई (Unit):", s_3: "3. रकबा का मान (Value):", b_calc: "गणना करें (CALCULATE)", b_title: "🔻 कुल 16 आना का विवरण (Full Property Logic)", btn_toggle_conv: "📏 लंबाई एवं क्षेत्रफल परिवर्तक (Unit Converter)", b_toggle: "➕ जमीन जोड़ / घटाव (Land Calculator)", c_title_len: "🔗 त्वरित लंबाई परिवर्तक (Length Converter)", c_title_area: "🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter)", l_kadi: "कड़ी (Kadi)", l_feet: "फिट (Feet)", l_meter: "मीटर (Meter)", l_sqk: "वर्ग कड़ी (Sq.Kadi)", l_sqf_l: "वर्ग फिट (Sq.Ft)", l_sqm_l: "वर्ग मीटर (Sq.Mtr)", ad_title: "जमीन जोड़ / घटाव (Land Adder)", b_add: "+ पंक्ति जोड़ें (Add Row)", b_tot: "= कुल (Total)", opt_sf: "वर्ग फीट (Sq. Ft)", opt_sy: "वर्ग गज (Sq. Yard)", opt_sk: "वर्ग कड़ी (Sq. Kadi)", opt_dc: "डिसमिल (Decimal)", opt_ac: "एकड़ (Acre)", opt_hc: "हेक्टेयर (Hectare)", opt_sm: "वर्ग मीटर (Sq. Meter)", opt_mx: "बिघा - कट्ठा - धुर - (धुरकी/कनवाँ)", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", la_mi: "छोटी इकाई (Micro)", lbl_16ana: "16 आना (Full)" },
-        en: { bg_label: "Bigha", kt_label: "Katha", dh_label: "Dhur", dhu: "Dhurki", kan: "Kanwan", lbl_an: "Ana", lbl_gn: "Ganda", lbl_kr: "Kauri", lbl_kt: "Krant", lbl_dn: "Dant", lbl_rn: "Ren", lbl_ps: "Paras", lbl_kw: "Kanwan", lbl_l: "📏 Lagga (Hand - 1.5 ft)", lbl_s: "⚙️1 Dhur (Sq.Ft)", s_1: "1. Share / Zamindari Details:", r_head: "📊 Result", r_ent: "Your Entered Area:", s_2: "2. Unit Type:", s_3: "3. Value:", b_calc: "CALCULATE", b_title: "🔻 Breakdown of 16 Ana (Full Logic)", btn_toggle_conv: "📏 Unit Converter", b_toggle: "➕ Land Calculator", c_title_len: "🔗 Length Converter", c_title_area: "🔗 Area Converter", l_kadi: "Kadi", l_feet: "Feet", l_meter: "Meter", l_sqk: "Sq.Kadi", l_sqf_l: "Sq.Ft", l_sqm_l: "Sq.Mtr", ad_title: "Land Adder", b_add: "+ Add Row", b_tot: "= Total", opt_sf: "Sq. Ft", opt_sy: "Sq. Yard", opt_sk: "Sq. Kadi", opt_dc: "Decimal", opt_ac: "Acre", opt_hc: "Hectare", opt_sm: "Sq. Meter", opt_mx: "Bigha - Katha - Dhur", opt_kw_sel: "Kanwan", opt_dk_sel: "Dhurki", la_mi: "Micro Unit", lbl_16ana: "16 Ana (Full)" },
-        bn: { m_h2: "SKR জিও-লিগ্যাল অ্যাসোসিয়েটস", m_h4: "স্মার্ট সলিউশন এবং ডিজিটাল ডকুমেন্টেশন", bg_label: "বিঘা", kt_label: "কাঠা", dh_label: "ধুর", dhu: "ধুরকি", kan: "কনওয়া", lbl_an: "আনা", lbl_gn: "গণ্ডা", lbl_kr: "কড়ি", lbl_kt: "ক্রান্ত", lbl_dn: "দন্ত", lbl_rn: "রেণ", lbl_ps: "পরস", lbl_kw: "কনওয়া", lbl_l: "📏 লগ্গা (হাত - ১.৫ ফুট)", lbl_s: "⚙️১ ধুর (বর্গ ফুট)", s_1: "১. অংশ / জমিদারী বিবরণ:", s_2: "২. ইউনিটের ধরন:", s_3: "৩. রডবার মান:", b_calc: "হিসাব করুন", b_title: "🔻 ১৬ আনার বিবরণ", btn_toggle_conv: "📏 একক রূপান্তরকারী", b_toggle: "➕ জমি যোগকারী", c_title_len: "🔗 দৈর্ঘ্য রূপান্তরকারী", c_title_area: "🔗 ক্ষেত্রফল রূপান্তরকারী", l_kadi: "কড়ি", l_feet: "ফুট", l_meter: "মিটার", l_sqk: "বর্গ কড়ি", l_sqf_l: "বর্গ ফুট", l_sqm_l: "বর্গ মিটার", ad_title: "জমি যোগকারী", b_add: "+ লাইন যোগ করুন", b_tot: "= মোট", opt_sf: "বর্গ ফুট", opt_sy: "বর্গ গজ", opt_sk: "বর্গ কড়ি", opt_dc: "ডেসিমেল", opt_ac: "একর", opt_hc: "হেক্টর", opt_sm: "বর্গ মিটার", opt_mx: "বিঘা - কাঠা - ধুর", opt_kw_sel: "কনওয়া", opt_dk_sel: "ধুরকি", r_head: "📊 ফলাফল", r_ent: "আপনার প্রবেশ করা এলাকা:", la_mi: "ছোট ইউনিট", lbl_16ana: "১৬ আনা (Full)" },
-        mr: { m_h2: "SKR जिओ-लीगल असोसिएट्स", m_h4: "स्मार्ट सोल्युशन्स आणि डिजिटल दस्तऐजीकरण", bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हात - १.५ ft)", lbl_s: "⚙️१ धुर (चौ.फूट)", s_1: "१. हिस्सा / जमीनदारी तपशील:", s_2: "२. रक्कबा एकक:", s_3: "३. रक्कबा मूल्य:", b_calc: "गणना करा", b_title: "🔻 १६ आना तपशील", btn_toggle_conv: "📏 युनिट कन्व्हर्टर", b_toggle: "➕ जमीन बेरीज यंत्र", c_title_len: "🔗 लांबी परिवर्तक", c_title_area: "🔗 क्षेत्र परिवर्तक", l_kadi: "कडी", l_feet: "फूट", l_meter: "मीटर", l_sqk: "चौ.कडी", l_sqf_l: "चौ.फूट", l_sqm_l: "चौ.मीटर", ad_title: "जमीन बेरीज यंत्र", b_add: "+ ओळ जोडा", b_tot: "= एकूण", opt_sf: "चौ. फूट", opt_sy: "चौ. वार", opt_sk: "चौ. कडी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "चौ. मीटर", opt_mx: "बिघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 निकाल", r_ent: "तुमचे प्रविष्ट क्षेत्र:", la_mi: "लहान युनिट", lbl_16ana: "१६ आना (Full)" },
-        bh: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबा के इकाई:", s_3: "3. रकबा के मान:", b_calc: "हिसाब करीं", b_title: "🔻 कुल 16 आना के विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 रकबा परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ लाइन जोड़ीं", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "रउआ दर्ज कइले रकबा:", la_mi: "छोटका इकाई", lbl_16ana: "१६ आना (Full)" },
-        mai: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबाक इकाई:", s_3: "3. रकबाक मान:", b_calc: "हिसाब करू", b_title: "🔻 कुल 16 आनाक विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 क्षेत्रफल परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ पंक्ति जोड़ू", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "अहाँक दर्ज कयल रकबा:", la_mi: "छोट इकाई", lbl_16ana: "१६ आना (Full)" },
-        kai: { m_h2: "𑂮𑂹𑂍𑂹𑂩 𑂔𑂱𑂨𑂷-𑂪𑂱𑂏𑂪 𑂉𑂮𑂷𑂮𑂱𑂉𑂗𑂹𑂮", m_h4: "𑂮𑂹𑂧𑂰𑂩𑂹𑂗 𑂮𑂷𑂪𑂹𑂨𑂴𑂬𑂢", bg_label: "𑂥𑂱𑂐𑂰", kt_label: "𑂍𑂗𑂹𑂗𑂰", dh_label: "𑂠𑂳𑂩", dhu: "𑂠𑂳𑂩𑂍𑂲", kan: "𑂍𑂢𑂥𑂰𑂁", lbl_an: "𑂄𑂢𑂰", lbl_gn: "𑂏𑂁𑂗𑂰", lbl_kr: "𑂍𑂷𑂚𑂲", lbl_kt: "𑂍𑂹𑂩𑂢𑂹𑂞", lbl_dn: "𑂠𑂢𑂹𑂞", lbl_rn: "𑂩𑂉𑂢", lbl_ps: "𑂣𑂩𑂮", lbl_kw: "𑂍𑂢𑂥𑂰𑂁", lbl_l: "📏 𑂪𑂏𑂹𑂏𑂰 (𑂯𑂰𑂟 - 1.5 ft)", lbl_s: "⚙️१ 𑂠𑂳𑂩 (𑂥𑂩𑂹𑂏 𑂤𑂲𑂗)", s_1: "1. 𑂯𑂱𑂮𑂹𑂮𑂰 / 𑂔𑂧𑂲𑂁𑂠𑂰𑂩𑂲 𑂥𑂱𑂨𑂷𑂩𑂰:", b_title: "🔻 𑂍𑂳𑂪 16 𑂄𑂢𑂰 𑂥𑂱𑂨𑂷𑂩𑂰", btn_toggle_conv: "📏 𑂪𑂁𑂥𑂰𑂆 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", b_toggle: "➕ 𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", s_2: "2. 𑂉𑂍𑂰𑂆:", s_3: "3. 𑂩𑂍𑂥𑂰 𑂧𑂰𑂢:", b_calc: "𑂏𑂝𑂝𑂰 𑂍𑂩𑂲𑂁", c_title_len: "🔗 𑂪𑂁𑂥𑂰𑂆 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", c_title_area: "🔗 𑂩𑂍𑂥𑂰 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", l_kadi: "𑂍𑂚𑂲", l_feet: "𑂤𑂲𑂗", l_meter: "𑂧𑂲𑂗𑂩", l_sqk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", l_sqf_l: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", l_sqm_l: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", ad_title: "𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", b_add: "+ 𑂣𑂁𑂍𑂹𑂞𑂱 𑂔𑂷𑂚𑂲𑂁", b_tot: "= 𑂍𑂳𑂪", opt_sf: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", opt_sy: "𑂥𑂩𑂹𑂏 𑂏𑂔", opt_sk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", opt_dc: "𑂗𑂱𑂮𑂧𑂱𑂪", opt_ac: "𑂉𑂍𑂚", opt_hc: "𑂯𑂯𑂉𑂍𑂹𑂗𑂨𑂩", opt_sm: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", opt_mx: "𑂥𑂱𑂐𑂰 - 𑂍𑂗𑂹𑂗𑂰 - 𑂠𑂳𑂩", opt_kw_sel: "𑂍𑂢𑂥𑂰𑂁", opt_dk_sel: "𑂠𑂳𑂩𑂍𑂲", la_mi: "𑂓𑂷𑂗 𑂆𑂍𑂰𑂆", r_head: "📊 𑂣𑂩𑂱𑂝𑂰𑂧", r_ent: "𑂄𑂣𑂍 𑂠𑂩𑂹𑂔 𑂍𑂆𑂪 𑂩𑂍𑂥𑂰:", lbl_16ana: "१६ आना (Full)" },
-        ori: { bg_label: "ବିଘା", kt_label: "କଟା", dh_label: "ଧୂର", dhu: "ଧୂରକୀ", kan: "କନୱା", lbl_an: "ଅଣା", lbl_gn: "ଗଣ୍ଡା", lbl_kr: "କଡ଼ି", lbl_kt: "କ୍ରାନ୍ତ", lbl_dn: "ଦନ୍ତ", lbl_rn: "ରେଣ", lbl_ps: "ପरସ", lbl_kw: "କନୱା", lbl_l: "📏 ଲଗା (ହାତ - ୧.୫ ft)", lbl_s: "⚙️୧ ଧୂର (ବର୍ଗ ଫୁଟ)", s_1: "୧. ଅଂଶ / ଜମିଦାରୀ ବିବରଣୀ:", s_2: "୨. ରକବା ର ଏକକ:", s_3: "୩. ରକବା ର ମୂଲ୍ୟ:", b_calc: "ଗଣନା କରନ୍ତୁ", b_title: "🔻 ୧୬ ଅଣାର ବିବରଣୀ", btn_toggle_conv: "📏 ଲମ୍ବ ଏବଂ କ୍ଷେତ୍ରଫଳ ପରିବର୍ତ୍ତକ", b_toggle: "➕ ଜମି ଯୋଗକାରୀ", c_title_len: "🔗 ଲମ୍ବ ପରିବର୍ତ୍ତକ", c_title_area: "🔗 କ୍ଷେତ୍ରଫଳ ପରିବର୍ତ୍ତକ", l_kadi: "କଡ଼ି", l_feet: "ଫୁଟ", l_meter: "ମିଟର", l_sqk: "ବର୍ଗ କଡ଼ି", l_sqf_l: "ବର୍ଗ ଫୁଟ", l_sqm_l: "ବର୍ଗ ମିଟର", ad_title: "ଜମି ଯୋଗକାରୀ", b_add: "+ ଧାଡ଼ି ଯୋଡ଼ନ୍ତୁ", b_tot: "= ମୋଟ", opt_sf: "ବର୍ଗ ଫୁଟ", opt_sy: "ବର୍ଗ ଗଜ", opt_sk: "ବର୍ଗ କଡ଼ି", opt_dc: "ଡେସିମେଲ", opt_ac: "ଏକର", opt_hc: "ହେକ୍ଟର", opt_sm: "ବର୍ଗ ମିଟର", opt_mx: "ବିଘା - କଟା - ଧୂର", opt_kw_sel: "କନୱା", opt_dk_sel: "ଧୂରକୀ", la_mi: "କ୍ଷୁଦ୍ର ଏକକ", r_head: "📊 ଫଳାଫଳ", r_ent: "ଆପଣଙ୍କର ପ୍ରବେଶ କ୍ଷେତ୍ର:", lbl_16ana: "୧୬ ଅଣା (Full)" }
+        def: { bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना/Ana", lbl_gn: "गंडा/Ganda", lbl_kr: "कौड़ी/Kauri", lbl_kt: "क्रन्त/Krant", lbl_dn: "दन्त/Dant", lbl_rn: "रेन/Ren", lbl_ps: "परस/Paras", lbl_kw: "कनवाँ/Kanwan", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (Sq.Ft)", s_1: "1. हिस्सा / जमींदारी विवरण (Share Details):", r_head: "📊 परिणाम (Result)", r_ent: "आपका दर्ज किया गया रकबा: (Your Entered Area:)", s_2: "2. रकबा की इकाई (Unit):", s_3: "3. रकबा का मान (Value):", b_calc: "गणना करें (CALCULATE)", b_title: "🔻 कुल 16 आना का विवरण (Full Property Logic)", btn_toggle_conv: "📏 लंबाई एवं क्षेत्रफल परिवर्तक (Unit Converter)", b_toggle: "➕ जमीन जोड़ / घटाव (Land Calculator)", c_title_len: "🔗 त्वरित लंबाई परिवर्तक (Length Converter - 4 Units)", c_title_area: "🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter - 4 Units)", l_kadi: "कड़ी (Kadi)", l_feet: "फिट (Feet)", l_yard: "गज (Yard)", l_meter: "मीटर (Meter)", l_sqk: "वर्ग कड़ी (Sq.Kadi)", l_sqf_l: "वर्ग फिट (Sq.Ft)", l_sqy_l: "वर्ग गज (Sq.Yard)", l_sqm_l: "वर्ग मीटर (Sq.Mtr)", ad_title: "जमीन जोड़ / घटाव (Land Adder)", b_add: "+ पंक्ति जोड़ें (Add Row)", b_tot: "= कुल (Total)", opt_sf: "वर्ग फीट (Sq. Ft)", opt_sy: "वर्ग गज (Sq. Yard)", opt_sk: "वर्ग कड़ी (Sq. Kadi)", opt_dc: "डिसमिल (Decimal)", opt_ac: "एकड़ (Acre)", opt_hc: "हेक्टेयर (Hectare)", opt_sm: "वर्ग मीटर (Sq. Meter)", opt_mx: "बिघा - कट्ठा - धुर - (धुरकी/कनवाँ)", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", la_mi: "छोटी इकाई (Micro)", lbl_16ana: "16 आना (Full)" },
+        en: { bg_label: "Bigha", kt_label: "Katha", dh_label: "Dhur", dhu: "Dhurki", kan: "Kanwan", lbl_an: "Ana", lbl_gn: "Ganda", lbl_kr: "Kauri", lbl_kt: "Krant", lbl_dn: "Dant", lbl_rn: "Ren", lbl_ps: "Paras", lbl_kw: "Kanwan", lbl_l: "📏 Lagga (Hand - 1.5 ft)", lbl_s: "⚙️1 Dhur (Sq.Ft)", s_1: "1. Share / Zamindari Details:", r_head: "📊 Result", r_ent: "Your Entered Area:", s_2: "2. Unit Type:", s_3: "3. Value:", b_calc: "CALCULATE", b_title: "🔻 Breakdown of 16 Ana (Full Logic)", btn_toggle_conv: "📏 Unit Converter", b_toggle: "➕ Land Calculator", c_title_len: "🔗 Length Converter (4 Units)", c_title_area: "🔗 Area Converter (4 Units)", l_kadi: "Kadi", l_feet: "Feet", l_yard: "Yard", l_meter: "Meter", l_sqk: "Sq.Kadi", l_sqf_l: "Sq.Ft", l_sqy_l: "Sq.Yard", l_sqm_l: "Sq.Mtr", ad_title: "Land Adder", b_add: "+ Add Row", b_tot: "= Total", opt_sf: "Sq. Ft", opt_sy: "Sq. Yard", opt_sk: "Sq. Kadi", opt_dc: "Decimal", opt_ac: "Acre", opt_hc: "Hectare", opt_sm: "Sq. Meter", opt_mx: "Bigha - Katha - Dhur", opt_kw_sel: "Kanwan", opt_dk_sel: "Dhurki", la_mi: "Micro Unit", lbl_16ana: "16 Ana (Full)" },
+        pa: { bg_label: "ਬੀਘਾ", kt_label: "ਕੱਠਾ", dh_label: "ਧੁਰ", dhu: "ਧੁਰਕੀ", kan: "ਕਨਵਾਂ", lbl_an: "ਆਨਾ", lbl_gn: "ਗੰਡਾ", lbl_kr: "ਕੌੜੀ", lbl_kt: "ਕ੍ਰਾਂਤ", lbl_dn: "ਦੰਤ", lbl_rn: "ਰੇਨ", lbl_ps: "ਪਰਸ", lbl_kw: "ਕਨਵਾਂ", lbl_l: "📏 ਲੱਗਾ (1.5 ਫੁੱਟ)", lbl_s: "⚙️1 ਧੁਰ (ਵਰਗ ਫੁੱਟ)", s_1: "1. ਹਿੱਸਾ / ਜ਼ਿਮੀਂਦਾਰੀ ਵੇਰਵਾ:", s_2: "2. ਰਕਬੇ ਦੀ ਇਕਾਈ:", s_3: "3. ਰਕਬੇ ਦਾ ਮੁੱਲ:", b_calc: "ਹਿਸਾਬ ਕਰੋ", b_title: "🔻 ਪੂਰੇ 16 ਆਨੇ ਦਾ ਵੇਰਵਾ", btn_toggle_conv: "📏 ਲੰਬਾਈ ਅਤੇ ਰਕਬਾ ਪਰਿਵਰਤਕ", b_toggle: "➕ ਜ਼ਮੀਨ ਜੋੜ / ਘਟਾਓ", c_title_len: "🔗 ਲੰਬਾਈ ਪਰਿਵਰਤਕ", c_title_area: "🔗 ਖੇਤਰਫਲ ਪਰਿਵਰਤਕ", l_kadi: "ਕੜੀ", l_feet: "ਫੁੱਟ", l_yard: "ਗਜ਼", l_meter: "ਮੀਟਰ", l_sqk: "ਵਰਗ ਕੜੀ", l_sqf_l: "ਵਰਗ ਫੁੱਟ", l_sqy_l: "ਵਰਗ ਗਜ਼", l_sqm_l: "ਵਰਗ ਮੀਟਰ", ad_title: "ਜ਼ਮੀਨ ਕੈਲਕੁਲੇਟਰ", b_add: "+ ਕਤਾਰ ਜੋੜੋ", b_tot: "= ਕੁੱਲ", opt_sf: "ਵਰਗ ਫੁੱਟ", opt_sy: "ਵਰਗ ਗਜ਼", opt_sk: "ਵਰਗ ਕੜੀ", opt_dc: "ਡਿਸਮਿਲ", opt_ac: "ਏਕੜ", opt_hc: "ਹੈਕਟੇਅਰ", opt_sm: "ਵਰਗ ਮੀਟਰ", opt_mx: "ਬੀਘਾ - ਕੱਠਾ - ਧੁਰ", opt_kw_sel: "ਕਨਵਾਂ", opt_dk_sel: "ਧੁਰਕੀ", la_mi: "ਛੋਟੀ ਇਕਾਈ", lbl_16ana: "16 ਆਨਾ" },
+        gu: { bg_label: "વીઘા", kt_label: "કઠ્ઠા", dh_label: "ધુર", dhu: "ધુરકી", kan: "કનવાં", lbl_an: "આના", lbl_gn: "ગંડા", lbl_kr: "કૌડી", lbl_kt: "ક્રાંત", lbl_dn: "દંત", lbl_rn: "રેન", lbl_ps: "પરસ", lbl_kw: "કનવાં", lbl_l: "📏 લંગા (1.5 ft)", lbl_s: "⚙️1 ધુર (ચો.ફૂટ)", s_1: "1. હિસ્સો / જમીનદારી વિગત:", s_2: "2. જમીન માપ એકમ:", s_3: "3. માપ મૂલ્ય:", b_calc: "ગણતરી કરો", b_title: "🔻 સંપૂર્ણ 16 આનાની વિગત", btn_toggle_conv: "📏 એકમ પરિવર્તક", b_toggle: "➕ જમીન સરવાળો / બાદબાકી", c_title_len: "🔗 લંબાઈ કન્વર્ટર", c_title_area: "🔗 ક્ષેત્રફળ કન્વર્ટર", l_kadi: "કડી", l_feet: "ફૂટ", l_yard: "વાર (ગજ)", l_meter: "મીટર", l_sqk: "ચો.કડી", l_sqf_l: "ચો.ફૂટ", l_sqy_l: "ચોરસ વાર", l_sqm_l: "ચો.મીટર", ad_title: "જમીન કેલ્ક્યુલેટર", b_add: "+ લાઇન ઉમેરો", b_tot: "= કુલ", opt_sf: "ચોરસ ફૂટ", opt_sy: "ચોરસ વાર", opt_sk: "ચોરસ કડી", opt_dc: "ડીસમિલ", opt_ac: "એકર", opt_hc: "હેક્ટર", opt_sm: "ચોરસ મીટર", opt_mx: "વીઘા - કઠ્ઠા - ધુર", opt_kw_sel: "કનવાં", opt_dk_sel: "ધુરકી", la_mi: "નાનો એકમ", lbl_16ana: "16 આના" },
+        bn: { bg_label: "বিঘা", kt_label: "কাঠা", dh_label: "ধুর", dhu: "ধুরকি", kan: "কনওয়া", lbl_an: "আনা", lbl_gn: "গণ্ডা", lbl_kr: "কড়ি", lbl_kt: "ক্রান্ত", lbl_dn: "দন্ত", lbl_rn: "রেণ", lbl_ps: "পরস", lbl_kw: "কনওয়া", lbl_l: "📏 লগ্গা (হাত - ১.৫ ফুট)", lbl_s: "⚙️১ ধুর (বর্গ ফুট)", s_1: "১. অংশ / জমিদারী বিবরণ:", s_2: "২. ইউনিটের ধরন:", s_3: "৩. রডবার মান:", b_calc: "হিসাব করুন", b_title: "🔻 ১৬ আনার বিবরণ", btn_toggle_conv: "📏 একক রূপান্তরকারী", b_toggle: "➕ জমি যোগকারী", c_title_len: "🔗 দৈর্ঘ্য রূপান্তরকারী", c_title_area: "🔗 ক্ষেত্রফল রূপান্তরকারী", l_kadi: "কড়ি", l_feet: "ফুট", l_yard: "গজ", l_meter: "মিটার", l_sqk: "বর্গ কড়ি", l_sqf_l: "বর্গ ফুট", l_sqy_l: "বর্গ গজ", l_sqm_l: "বর্গ মিটার", ad_title: "জমি যোগকারী", b_add: "+ লাইন যোগ করুন", b_tot: "= মোট", opt_sf: "বর্গ ফুট", opt_sy: "বর্গ গজ", opt_sk: "বর্গ কড়ি", opt_dc: "ডেসিমেল", opt_ac: "একর", opt_hc: "হেক্টর", opt_sm: "বর্গ মিটার", opt_mx: "বিঘা - কাঠা - ধুর", opt_kw_sel: "কনওয়া", opt_dk_sel: "ধুরকি", la_mi: "ছোট ইউনিট", lbl_16ana: "১৬ আনা (Full)" },
+        mr: { bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हात - १.५ ft)", lbl_s: "⚙️१ धुर (चौ.फूट)", s_1: "१. हिस्सा / जमीनदारी तपशील:", s_2: "२. रक्कबा एकक:", s_3: "३. रक्कबा मूल्य:", b_calc: "गणना करा", b_title: "🔻 १६ आना तपशील", btn_toggle_conv: "📏 युनिट कन्व्हर्टर", b_toggle: "➕ जमीन बेरीज यंत्र", c_title_len: "🔗 लांबी परिवर्तक", c_title_area: "🔗 क्षेत्र परिवर्तक", l_kadi: "कडी", l_feet: "फूट", l_yard: "वार (गज)", l_meter: "मीटर", l_sqk: "चौ.कडी", l_sqf_l: "चौ.फूट", l_sqy_l: "चौ.वार", l_sqm_l: "चौ.मीटर", ad_title: "जमीन बेरीज यंत्र", b_add: "+ ओळ जोडा", b_tot: "= एकूण", opt_sf: "चौ. फूट", opt_sy: "चौ. वार", opt_sk: "चौ. कडी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "चौ. मीटर", opt_mx: "बिघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", la_mi: "लहान युनिट", lbl_16ana: "१६ आना (Full)" },
+        ta: { bg_label: "பிகா", kt_label: "கத்தா", dh_label: "துர்", dhu: "துர்கி", kan: "கன்வா", lbl_an: "ஆணா", lbl_gn: "கண்டா", lbl_kr: "கௌரி", lbl_kt: "க்ராந்த்", lbl_dn: "தந்த்", lbl_rn: "ரேன்", lbl_ps: "பரஸ்", lbl_kw: "கன்வா", lbl_l: "📏 லக்கா (1.5 அடி)", lbl_s: "⚙️1 துர் (ச.அடி)", s_1: "1. பங்கு / நில விவரம்:", s_2: "2. பரப்பளவு அலகு:", s_3: "3. பரப்பளவு மதிப்பு:", b_calc: "கணக்கிடுக", b_title: "🔻 முழு 16 ஆணா விவரம்", btn_toggle_conv: "📏 அலகு மாற்றி", b_toggle: "➕ நில கால்குலேட்டர்", c_title_len: "🔗 நீளம் மாற்றி", c_title_area: "🔗 பரப்பளவு மாற்றி", l_kadi: "கடி", l_feet: "அடி", l_yard: "கஜம் (யார்டு)", l_meter: "மீட்டர்", l_sqk: "சதுர கடி", l_sqf_l: "சதுர அடி", l_sqy_l: "சதுர கஜம்", l_sqm_l: "சதுர மீட்டர்", ad_title: "நில கூட்டல்/கழித்தல்", b_add: "+ வரிசை சேர்க்க", b_tot: "= மொத்தம்", opt_sf: "சதுர அடி", opt_sy: "சதுர கஜம்", opt_sk: "சதுர கடி", opt_dc: "சென்ட்", opt_ac: "ஏக்கர்", opt_hc: "ஹெக்டேர்", opt_sm: "சதுர மீட்டர்", opt_mx: "பிகா - கத்தா - துர்", opt_kw_sel: "கன்வா", opt_dk_sel: "துர்கி", la_mi: "நுண் அலகு", lbl_16ana: "16 ஆணா" },
+        te: { bg_label: "బిఘా", kt_label: "కట్టా", dh_label: "ధుర్", dhu: "ధుర్కీ", kan: "కన్వా", lbl_an: "అణా", lbl_gn: "గండా", lbl_kr: "కౌరి", lbl_kt: "క్రాంత్", lbl_dn: "దంత్", lbl_rn: "రేన్", lbl_ps: "పరస్", lbl_kw: "కన్వా", lbl_l: "📏 లగ్గా (1.5 అడుగులు)", lbl_s: "⚙️1 ధుర్ (చ.అడుగులు)", s_1: "1. వాటా / వివరాలు:", s_2: "2. విస్తీర్ణ యూనిట్:", s_3: "3. విస్తీర్ణ విలువ:", b_calc: "లెక్కించండి", b_title: "🔻 పూర్తి 16 అణాల వివరాలు", btn_toggle_conv: "📏 యూనిట్ కన్వర్టర్", b_toggle: "➕ భూమి కూడిక / తీసివేత", c_title_len: "🔗 పొడవు కన్వర్టర్", c_title_area: "🔗 వైశాల్యం కన్వర్టర్", l_kadi: "కడి", l_feet: "అడుగులు", l_yard: "గజం (యార్డ్)", l_meter: "మీటర్", l_sqk: "చదరపు కడి", l_sqf_l: "చదరపు అడుగులు", l_sqy_l: "చదరపు గజాలు", l_sqm_l: "చదరపు మీటర్లు", ad_title: "భూమి క్యాలిక్యులేటర్", b_add: "+ వరుసను జోడించు", b_tot: "= మొత్తం", opt_sf: "చదరపు అడుగులు", opt_sy: "చదరపు గజాలు", opt_sk: "చదరపు కడి", opt_dc: "డెసిమల్", opt_ac: "ఎకరం", opt_hc: "హెక్టారు", opt_sm: "చదరపు మీటర్లు", opt_mx: "బిఘా - కట్టా - ధుర్", opt_kw_sel: "కన్వా", opt_dk_sel: "ధుర్కీ", la_mi: "చిన్న యూనిట్", lbl_16ana: "16 అణాలు" },
+        kn: { bg_label: "ಬಿಘಾ", kt_label: "ಕಟ್ಟಾ", dh_label: "ಧುರ್", dhu: "ಧುರ್ಕಿ", kan: "ಕನ್ವಾ", lbl_an: "ಆಣೆ", lbl_gn: "ಗಂಡಾ", lbl_kr: "ಕೌರಿ", lbl_kt: "ಕ್ರಾಂತಿ", lbl_dn: "ದಂತ", lbl_rn: "ರೇನ್", lbl_ps: "ಪರಸ್", lbl_kw: "ಕನ್ವಾ", lbl_l: "📏 ಲಗ್ಗಾ (1.5 ಅಡಿ)", lbl_s: "⚙️1 ಧುರ್ (ಚ.ಅಡಿ)", s_1: "1. ಪಾಲು ವಿವರ:", s_2: "2. ವಿಸ್ತೀರ್ಣದ ಘಟಕ:", s_3: "3. ವಿಸ್ತೀರ್ಣದ ಮೌಲ್ಯ:", b_calc: "ಲೆಕ್ಕಾಚಾರ ಮಾಡಿ", b_title: "🔻 ಪೂರ್ಣ 16 ಆಣೆ ವಿವರ", btn_toggle_conv: "📏 ಘಟಕ ಪರಿವರ್ತಕ", b_toggle: "➕ ಭೂಮಿ ಕ್ಯಾಲ್ಕುಲೇಟರ್", c_title_len: "🔗 ಉದ್ದ ಪರಿವರ್ತಕ", c_title_area: "🔗 ವಿಸ್ತೀರ್ಣ ಪರಿವರ್ತಕ", l_kadi: "ಕಡಿ", l_feet: "ಅಡಿ", l_yard: "ಗಜ (ಯಾರ್ಡ್)", l_meter: "ಮೀಟರ್", l_sqk: "ಚದರ ಕಡಿ", l_sqf_l: "ಚದರ ಅಡಿ", l_sqy_l: "ಚದರ ಗಜ", l_sqm_l: "ಚದರ ಮೀಟರ್", ad_title: "ಭೂಮಿ ಸೇರ್ಪಡೆ/ಕಳೆಯುವಿಕೆ", b_add: "+ ಸಾಲು ಸೇರಿಸಿ", b_tot: "= ಒಟ್ಟು", opt_sf: "ಚದರ ಅಡಿ", opt_sy: "ಚದರ ಗಜ", opt_sk: "ಚದರ ಕಡಿ", opt_dc: "ಡೆಸಿಮಲ್", opt_ac: "ಎಕರೆ", opt_hc: "ಹೆಕ್ಟೇರ್", opt_sm: "ಚದರ ಮೀಟರ್", opt_mx: "ಬಿಘಾ - ಕಟ್ಟಾ - ಧುರ್", opt_kw_sel: "ಕನ್ವಾ", opt_dk_sel: "ಧುರ್ಕಿ", la_mi: "ಸಣ್ಣ ಘಟಕ", lbl_16ana: "16 ಆಣೆ" },
+        ml: { bg_label: "ബിഘ", kt_label: "കട്ട", dh_label: "ധുർ", dhu: "ധുർക്കി", kan: "കൻവാ", lbl_an: "ആണ", lbl_gn: "ഗണ്ട", lbl_kr: "കൗരി", lbl_kt: "ക്രാന്ത്", lbl_dn: "ദന്ത്", lbl_rn: "രേൻ", lbl_ps: "പരസ്", lbl_kw: "കൻവാ", lbl_l: "📏 ലഗ്ഗ (1.5 അടി)", lbl_s: "⚙️1 ധുർ (ച.അടി)", s_1: "1. വിഹിതം വിവരങ്ങൾ:", s_2: "2. വിസ്തീർണ്ണ യൂണിറ്റ്:", s_3: "3. വിസ്തീർണ്ണ മൂല്യം:", b_calc: "കണക്കാക്കുക", b_title: "🔻 പൂർണ്ണ 16 ആണ വിവരങ്ങൾ", btn_toggle_conv: "📏 യൂണിറ്റ് കൺവെർട്ടർ", b_toggle: "➕ ഭൂമി കാൽക്കുലേറ്റർ", c_title_len: "🔗 നീളം കൺവെർട്ടർ", c_title_area: "🔗 വിസ്തീർണ്ണം കൺവെർട്ടർ", l_kadi: "കടി", l_feet: "അടി", l_yard: "ഗജം (യാർഡ്)", l_meter: "മീറ്റർ", l_sqk: "ചതുരശ്ര കടി", l_sqf_l: "ചതുരശ്ര അടി", l_sqy_l: "ചതുരശ്ര ഗജം", l_sqm_l: "ചതുരശ്ര മീറ്റർ", ad_title: "ഭൂമി കൂട്ടൽ/കുറയ്ക്കൽ", b_add: "+ വരി ചേർക്കുക", b_tot: "= ആകെ", opt_sf: "ചതുരശ്ര അടി", opt_sy: "ചതുരശ്ര ഗജം", opt_sk: "ചതുരശ്ര കടി", opt_dc: "ഡെസിമൽ", opt_ac: "ഏക്കർ", opt_hc: "ഹെക്ടർ", opt_sm: "ചതുരശ്ര മീറ്റർ", opt_mx: "ബിഘ - കട്ട - ധുർ", opt_kw_sel: "കൻവാ", opt_dk_sel: "ധുർക്കി", la_mi: "ചെറിയ യൂണിറ്റ്", lbl_16ana: "16 ആണ" },
+        ori: { bg_label: "ବିଘା", kt_label: "କଟା", dh_label: "ଧୂର", dhu: "ଧୂରକୀ", kan: "କନୱା", lbl_an: "ଅଣା", lbl_gn: "ଗଣ୍ଡା", lbl_kr: "କଡ଼ି", lbl_kt: "କ୍ରାନ୍ତ", lbl_dn: "ଦନ୍ତ", lbl_rn: "ରେଣ", lbl_ps: "ପरସ", lbl_kw: "କନୱା", lbl_l: "📏 ଲଗା (୧.୫ ft)", lbl_s: "⚙️୧ ଧୂର (ବର୍ଗ ଫୁଟ)", s_1: "୧. ଅଂଶ / ଜମିଦାରୀ ବିବରଣୀ:", s_2: "୨. ରକବା ର ଏକକ:", s_3: "୩. ରକବା ର ମୂଲ୍ୟ:", b_calc: "ଗଣନା କରନ୍ତୁ", b_title: "🔻 ୧୬ ଅଣାର ବିବରଣୀ", btn_toggle_conv: "📏 ଏକକ ପରିବର୍ତ୍ତକ", b_toggle: "➕ ଜମି ଯୋଗକାରୀ", c_title_len: "🔗 ଲମ୍ବ ପରିବର୍ତ୍ତକ", c_title_area: "🔗 କ୍ଷେତ୍ରଫଳ ପରିବର୍ତ୍ତକ", l_kadi: "କଡ଼ି", l_feet: "ଫୁଟ", l_yard: "ଗଜ (ୟାର୍ଡ)", l_meter: "ମିଟର", l_sqk: "ବର୍ଗ କଡ଼ି", l_sqf_l: "ବର୍ଗ ଫୁଟ", l_sqy_l: "ବର୍ଗ ଗଜ", l_sqm_l: "ବର୍ଗ ମିଟର", ad_title: "ଜମି ଯୋଗକାରୀ", b_add: "+ ଧାଡ଼ି ଯୋଡ଼ନ୍ତୁ", b_tot: "= ମୋଟ", opt_sf: "ବର୍ଗ ଫୁଟ", opt_sy: "ବର୍ଗ ଗଜ", opt_sk: "ବର୍ଗ କଡ଼ି", opt_dc: "ଡେସିମେଲ", opt_ac: "ଏକର", opt_hc: "ହେକ୍ଟର", opt_sm: "ବର୍ଗ ମିଟର", opt_mx: "ବିଘା - କଟା - ଧୂର", opt_kw_sel: "କନୱା", opt_dk_sel: "ଧୂରକୀ", la_mi: "କ୍ଷୁଦ୍ର ଏକକ", lbl_16ana: "୧୬ ଅଣା (Full)" },
+        as: { bg_label: "বিঘা", kt_label: "কঠা", dh_label: "ধূৰ", dhu: "ধূৰকী", kan: "কনৱা", lbl_an: "আনা", lbl_gn: "গণ্ডা", lbl_kr: "কড়ি", lbl_kt: "ক্ৰান্ত", lbl_dn: "দন্ত", lbl_rn: "ৰেণ", lbl_ps: "পৰস", lbl_kw: "কনৱা", lbl_l: "📏 লগ্গা (১.৫ ফুট)", lbl_s: "⚙️১ ধূৰ (বৰ্গফুট)", s_1: "১. অংশ / জমিদাৰী বিৱৰণ:", s_2: "২. এককৰ ধৰণ:", s_3: "৩. মান:", b_calc: "গণনা কৰক", b_title: "🔻 ১৬ অনাৰ সম্পূৰ্ণ বিৱৰণ", btn_toggle_conv: "📏 একক ৰূপান্তৰক", b_toggle: "➕ মাটি যোগ/বিয়োগ", c_title_len: "🔗 দৈৰ্ঘ্য ৰূপান্তৰক", c_title_area: "🔗 কালি ৰূপান্তৰক", l_kadi: "কড়ি", l_feet: "ফুট", l_yard: "গজ (য়াৰ্ড)", l_meter: "মিটাৰ", l_sqk: "বৰ্গ কড়ি", l_sqf_l: "বৰ্গ ফুট", l_sqy_l: "বৰ্গ গজ", l_sqm_l: "বৰ্গ মিটাৰ", ad_title: "মাটি কেলকুলেটৰ", b_add: "+ শাৰী যোগ কৰক", b_tot: "= মুঠ", opt_sf: "বৰ্গ ফুট", opt_sy: "বৰ্গ গজ", opt_sk: "বৰ্গ কড়ি", opt_dc: "ডেচিমেল", opt_ac: "একৰ", opt_hc: "হেক্টৰ", opt_sm: "বৰ্গ মিটাৰ", opt_mx: "বিঘা - কঠা - ধূৰ", opt_kw_sel: "কনৱা", opt_dk_sel: "ধূৰকী", la_mi: "ক্ষুদ্ৰ একক", lbl_16ana: "১৬ অনা" },
+        ur: { bg_label: "بیگھہ", kt_label: "کٹھہ", dh_label: "دھور", dhu: "دھورکی", kan: "کنواں", lbl_an: "آنہ", lbl_gn: "گنڈا", lbl_kr: "کوڑی", lbl_kt: "کرانت", lbl_dn: "دنت", lbl_rn: "رین", lbl_ps: "پارس", lbl_kw: "کنواں", lbl_l: "📏 لگا (1.5 فٹ)", lbl_s: "⚙️1 دھور (مربع فٹ)", s_1: "1. حصہ / زمینداری تفصیل:", s_2: "2. رقبہ کی اکائی:", s_3: "3. رقبہ کی قیمت:", b_calc: "حساب کریں", b_title: "🔻 مکمل 16 آنہ تفصیل", btn_toggle_conv: "📏 یونٹ کنورٹر", b_toggle: "➕ زمین جمع / تفریق", c_title_len: "🔗 لمبائی کنورٹر", c_title_area: "🔗 رقبہ کنورٹر", l_kadi: "کڑی", l_feet: "فٹ", l_yard: "گز", l_meter: "میٹر", l_sqk: "مربع کڑی", l_sqf_l: "مربع فٹ", l_sqy_l: "مربع گز", l_sqm_l: "مربع میٹر", ad_title: "زمین کیلکولیٹر", b_add: "+ قطار جوڑیں", b_tot: "= کل", opt_sf: "مربع فٹ", opt_sy: "مربع گز", opt_sk: "مربع کڑی", opt_dc: "ڈسمل", opt_ac: "ایکڑ", opt_hc: "ہیکٹر", opt_sm: "مربع میٹر", opt_mx: "بیگھہ - کٹھہ - دھور", opt_kw_sel: "کنواں", opt_dk_sel: "دھورکی", la_mi: "چھوٹی اکائی", lbl_16ana: "16 آنہ" },
+        bh: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबा के इकाई:", s_3: "3. रकबा के मान:", b_calc: "हिसाब करीं", b_title: "🔻 कुल 16 आना के विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 रकबा परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_yard: "गज", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqy_l: "वर्ग गज", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ लाइन जोड़ीं", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "रउआ दर्ज कइले रकबा:", la_mi: "छोटका इकाई", lbl_16ana: "१६ आना (Full)" },
+        mai: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबाक इकाई:", s_3: "3. रकबाक मान:", b_calc: "हिसाब करू", b_title: "🔻 कुल 16 आनाक विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 क्षेत्रफल परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_yard: "गज", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqy_l: "वर्ग गज", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ पंक्ति जोड़ू", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "अहाँक दर्ज कयल रकबा:", la_mi: "छोट इकाई", lbl_16ana: "१६ आना (Full)" },
+        kai: { m_h2: "𑂮𑂹𑂍𑂹𑂩 𑂔𑂱𑂨𑂷-𑂪𑂱𑂏𑂪 𑂉𑂮𑂷𑂮𑂱𑂉𑂗𑂹𑂮", m_h4: "𑂮𑂹𑂧𑂰𑂩𑂹𑂗 𑂮𑂷𑂪𑂹𑂨𑂴𑂬𑂢", bg_label: "𑂥𑂱𑂐𑂰", kt_label: "𑂍𑂗𑂹𑂗𑂰", dh_label: "𑂠𑂳𑂩", dhu: "𑂠𑂳𑂩𑂍𑂲", kan: "𑂍𑂢𑂥𑂰𑂁", lbl_an: "𑂄𑂢𑂰", lbl_gn: "𑂏𑂁𑂗𑂰", lbl_kr: "𑂍𑂷𑂚𑂲", lbl_kt: "𑂍𑂹𑂩𑂢𑂹𑂞", lbl_dn: "𑂠𑂢𑂹𑂞", lbl_rn: "𑂩𑂉𑂢", lbl_ps: "𑂣𑂩𑂮", lbl_kw: "𑂍𑂢𑂥𑂰𑂁", lbl_l: "📏 𑂪𑂏𑂹𑂏𑂰 (1.5 ft)", lbl_s: "⚙️१ 𑂠𑂳𑂩 (𑂥𑂩𑂹𑂏 𑂤𑂲𑂗)", s_1: "1. 𑂯𑂱𑂮𑂹𑂮𑂰 𑂥𑂱𑂨𑂷𑂩𑂰:", b_title: "🔻 𑂍𑂳𑂪 16 𑂄𑂢𑂰", btn_toggle_conv: "📏 𑂪𑂁𑂥𑂰𑂆 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", b_toggle: "➕ 𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", s_2: "2. 𑂉𑂍𑂰𑂆:", s_3: "3. 𑂩𑂍𑂥𑂰 𑂧𑂰𑂢:", b_calc: "𑂏𑂝𑂝𑂰 𑂍𑂩𑂲𑂁", c_title_len: "🔗 𑂪𑂁𑂥𑂰𑂆", c_title_area: "🔗 𑂩𑂍𑂥𑂰", l_kadi: "𑂍𑂚𑂲", l_feet: "𑂤𑂲𑂗", l_yard: "𑂏𑂔", l_meter: "𑂧𑂲𑂗𑂩", l_sqk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", l_sqf_l: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", l_sqy_l: "𑂥𑂩𑂹𑂏 𑂏𑂔", l_sqm_l: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", ad_title: "𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", b_add: "+ 𑂣𑂁𑂍𑂹𑂞𑂱 𑂔𑂷𑂚𑂲𑂁", b_tot: "= 𑂍𑂳𑂪", opt_sf: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", opt_sy: "𑂥𑂩𑂹𑂏 𑂏𑂔", opt_sk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", opt_dc: "𑂗𑂱𑂮𑂧𑂱𑂪", opt_ac: "𑂉𑂍𑂚", opt_hc: "𑂯𑂉𑂍𑂹𑂗𑂨𑂩", opt_sm: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", opt_mx: "𑂥𑂱𑂐𑂰 - 𑂍𑂗𑂹𑂗𑂰 - 𑂠𑂳𑂩", opt_kw_sel: "𑂍𑂢𑂥𑂰𑂁", opt_dk_sel: "𑂠𑂳𑂩𑂍𑂲", la_mi: "𑂓𑂷𑂗 𑂆𑂍𑂰𑂆", r_head: "📊 𑂣𑂩𑂱𑂝𑂰𑂧", r_ent: "𑂄𑂣𑂍 𑂠𑂩𑂹𑂔 𑂍𑂆𑂪 𑂩𑂍𑂥𑂰:", lbl_16ana: "१६ आना (Full)" }
     };
 
     function applyLanguage(lang) {
@@ -448,31 +755,25 @@
         if (document.getElementById('resultBox').style.display === 'block') calculate();
         if (document.getElementById('landTotalRes').innerHTML !== "") calcLandTotal();
     }
-    function changeLanguage() { let lang = document.getElementById('langSelector').value; localStorage.setItem('skr_user_lang_final', lang); applyLanguage(lang); }
+
+    /* --- [स्थायी भाषा लॉक (PERMANENT PERSISTENCE)] --- */
+    function changeLanguage() { 
+        let lang = document.getElementById('langSelector').value; 
+        localStorage.setItem('aero_calc_lang_lock', lang); 
+        applyLanguage(lang); 
+    }
     
     function finalizeInit() {
         document.getElementById('deviceIdDisplay').innerText = deviceId;
-        let savedL = localStorage.getItem('skr_user_lang_final') || 'def';
+        let savedL = localStorage.getItem('aero_calc_lang_lock') || 'def';
         document.getElementById('langSelector').value = savedL;
         applyLanguage(savedL);
+        document.getElementById('repDate').innerText = new Date().toLocaleDateString('hi-IN');
     }
 
     function showToast(message) { let x = document.getElementById("toastBox"); x.innerText = message; x.className = "show"; setTimeout(() => x.className = "", 2500); }
-    
-    function unlockApp(isMaster = false) { 
-        document.getElementById('licenseOverlay').style.display = 'none'; 
-        if(isMaster) {
-            document.getElementById('loginBox').classList.add('hidden');
-            document.getElementById('adminPanel').classList.remove('hidden');
-            showToast("👑 MASTER ADMIN"); 
-        }
-    }
-
     function logoutMaster() { if(confirm("Logout?")) { localStorage.removeItem('skr_final_user'); location.reload(); } }
-    
     function changeUser() { localStorage.removeItem('skr_final_user'); location.reload(); }
-
-    function getSmartCode(dId, months) { let d = new Date(); let day = d.getDate(); let m = d.getMonth() + 1; let y = d.getFullYear(); let f = months == 1 ? (day*765+m*876+y*5) : months == 3 ? (day*333+m*222+y*10) : (day*111+m*999+y*20); return (parseInt(dId) + (months==1?12345:months==3?54321:99999) + f).toString(); }
 
     let tapCount = 0; let tapTimer = null; 
     function handleHeaderTap() { 
@@ -501,37 +802,46 @@
     function toggleConverter() { document.getElementById('converterContainer').classList.toggle('hidden'); }
     function toggleLandCalc() { document.getElementById('landCalcContainer').classList.toggle('hidden'); if(!document.getElementById('landCalcContainer').classList.contains('hidden') && document.querySelectorAll('.land-row').length === 0) addLandRow(); }
     
+    /* --- [४-यूनिट त्वरित परिवर्तक: कड़ी, फीट, गज (यार्ड), मीटर] --- */
     function syncLen(src) {
-        let k = document.getElementById('qKadi'), f = document.getElementById('qFeet'), m = document.getElementById('qMeter');
-        let val = parseFloat(src === 'k' ? k.value : src === 'f' ? f.value : m.value);
-        if (!val || val === 0 || isNaN(val)) { k.value = ""; f.value = ""; m.value = ""; return; }
-        let baseFeet = (src === 'k') ? val * 0.66 : (src === 'f') ? val : val / 0.3048;
+        let k = document.getElementById('qKadi'), f = document.getElementById('qFeet'), y = document.getElementById('qYard'), m = document.getElementById('qMeter');
+        let val = parseFloat(src === 'k' ? k.value : src === 'f' ? f.value : src === 'y' ? y.value : m.value);
+        if (!val || val === 0 || isNaN(val)) { k.value = ""; f.value = ""; y.value = ""; m.value = ""; return; }
+        let baseFeet = (src === 'k') ? (val * 0.66) : (src === 'f') ? val : (src === 'y') ? (val * 3.0) : (val / 0.3048);
         if(src !== 'k') k.value = (baseFeet / 0.66).toFixed(2);
         if(src !== 'f') f.value = baseFeet.toFixed(2);
+        if(src !== 'y') y.value = (baseFeet / 3.0).toFixed(2);
         if(src !== 'm') m.value = (baseFeet * 0.3048).toFixed(2);
     }
+
     function syncArea(src) {
-        let sk = document.getElementById('qSKadi'), sf = document.getElementById('qSFeet'), sm = document.getElementById('qSMeter');
-        let val = parseFloat(src === 'sk' ? sk.value : src === 'sf' ? sf.value : sm.value);
-        if (!val || val === 0 || isNaN(val)) { sk.value = ""; sf.value = ""; sm.value = ""; return; }
-        let baseSqFt = (src === 'sk') ? val * 0.4356 : (src === 'sf') ? val : val * 10.76391;
+        let sk = document.getElementById('qSKadi'), sf = document.getElementById('qSFeet'), sy = document.getElementById('qSYard'), sm = document.getElementById('qSMeter');
+        let val = parseFloat(src === 'sk' ? sk.value : src === 'sf' ? sf.value : src === 'sy' ? sy.value : sm.value);
+        if (!val || val === 0 || isNaN(val)) { sk.value = ""; sf.value = ""; sy.value = ""; sm.value = ""; return; }
+        let baseSqFt = (src === 'sk') ? (val * 0.4356) : (src === 'sf') ? val : (src === 'sy') ? (val * 9.0) : (val * 10.7639104);
         if(src !== 'sk') sk.value = (baseSqFt / 0.4356).toFixed(2);
         if(src !== 'sf') sf.value = baseSqFt.toFixed(2);
-        if(src !== 'sm') sm.value = (baseSqFt / 10.76391).toFixed(2);
+        if(src !== 'sy') sy.value = (baseSqFt / 9.0).toFixed(2);
+        if(src !== 'sm') sm.value = (baseSqFt / 10.7639104).toFixed(2);
     }
+
     function updateFromLagga() { let lEl = document.getElementById('laggaInput'), sEl = document.getElementById('scaleInput'); let val = parseFloat(lEl.value); if (!lEl.value || isNaN(val)) { sEl.value = ""; return; } sEl.value = parseFloat((val * 1.5 * val * 1.5).toFixed(4)); }
     function updateFromSqFt() { let lEl = document.getElementById('laggaInput'), sEl = document.getElementById('scaleInput'); let val = parseFloat(sEl.value); if (!sEl.value || isNaN(val)) { lEl.value = ""; return; } lEl.value = parseFloat((Math.sqrt(val) / 1.5).toFixed(4)); }
     const SQFT_PER_DECIMAL = 435.6, SQFT_PER_ACRE = 43560.0, SQFT_PER_HECTARE = 107639.104, SQFT_PER_SQKADI = 0.4356, SQFT_PER_SQMETER = 10.7639104; 
     function toggleLandInputs() { let unit = document.getElementById('unitType').value; document.getElementById('singleInput').style.display = (unit === 'local_mixed' ? 'none' : 'block'); document.getElementById('mixedInput').style.display = (unit === 'local_mixed' ? 'grid' : 'none'); }
     function resetAll() { document.getElementById('inAna').value = 16; document.querySelectorAll('input:not(#laggaInput):not(#scaleInput):not(#inAna)').forEach(el => el.value = ""); document.getElementById('resultBox').style.display = 'none'; document.getElementById('breakdownTable').innerHTML = ""; document.getElementById('landTotalRes').classList.add('hidden'); }
+    
     function formatArea(sqft, scale) { 
-        let lang = localStorage.getItem('skr_user_lang_final') || 'def', u = i18n[lang] || i18n.def;
+        let lang = localStorage.getItem('aero_calc_lang_lock') || 'def', u = i18n[lang] || i18n.def;
         let decTotal = sqft / SQFT_PER_DECIMAL, totalDhur = sqft / scale; 
         let bigha = Math.floor(totalDhur / 400), rem1 = totalDhur % 400; 
         let katha = Math.floor(rem1 / 20), rem2 = rem1 % 20; 
         let dhur = Math.floor(rem2), dhurki = ((rem2 - dhur) * 20).toFixed(2), kanma = ((rem2 - dhur) * 16).toFixed(2); 
         return { str: `${bigha} ${u.bg_label} - ${katha} ${u.kt_label} - ${dhur} ${u.dh_label}`, sub: `➜ ${kanma} ${u.opt_kw_sel} [या ${dhurki} ${u.opt_dk_sel}]`, dec: decTotal.toFixed(4), ac: (sqft / SQFT_PER_ACRE).toFixed(5), hec: (sqft / SQFT_PER_HECTARE).toFixed(6), sq: sqft.toFixed(2), kad: (sqft / SQFT_PER_SQKADI).toFixed(2), sqy: (sqft / 9.0).toFixed(2), sqm: (sqft / SQFT_PER_SQMETER).toFixed(2), acreSplit: `${Math.floor(decTotal / 100)} Ac - ${(decTotal % 100).toFixed(2)} Dec` }; 
     }
+
+    let lastCalcData = null;
+
     function calculate() { 
         let ana = parseFloat(document.getElementById('inAna').value) || 0; 
         let shareVal = (ana/16) + (parseFloat(document.getElementById('inGanda').value)||0)/320 + (parseFloat(document.getElementById('inKauri').value)||0)/1280 + (parseFloat(document.getElementById('inKrant').value)||0)/3840 + (parseFloat(document.getElementById('inDant').value)||0)/11520 + (parseFloat(document.getElementById('inRen').value)||0)/230400 + (parseFloat(document.getElementById('inParas').value)||0)/3686400 + (parseFloat(document.getElementById('inKanwan').value)||0)/58982400; 
@@ -549,20 +859,26 @@
         document.getElementById('resultBox').style.display = 'block'; 
         document.getElementById('resText').innerText = res.str; document.getElementById('resSub').innerText = res.sub; 
         document.getElementById('rDec').innerText = res.dec; document.getElementById('rSqFt').innerText = res.sq; document.getElementById('rSqYard').innerText = res.sqy; document.getElementById('rSqMeter').innerText = res.sqm; document.getElementById('rAcre').innerText = res.ac; document.getElementById('rAcreSplit').innerText = res.acreSplit; document.getElementById('rHec').innerText = res.hec; document.getElementById('rSqKadi').innerText = res.kad; 
-        let lang = localStorage.getItem('skr_user_lang_final') || 'def', u = i18n[lang] || i18n.def;
+        
+        lastCalcData = { res: res, scale: scale, lagga: document.getElementById('laggaInput').value, shareVal: shareVal, fullSq: fullSq, unit: unit };
+
+        let lang = localStorage.getItem('aero_calc_lang_lock') || 'def', u = i18n[lang] || i18n.def;
         let tableHTML = ""; let fracs = [ {n:u.lbl_an, v:1/16}, {n:u.lbl_gn, v:1/320}, {n:u.lbl_kr, v:1/1280}, {n:u.lbl_kt, v:1/3840}, {n:u.lbl_dn, v:1/11520}, {n:u.lbl_rn, v:1/230400}, {n:u.lbl_ps, v:1/3686400}, {n:u.lbl_kw, v:1/58982400} ]; 
         let fullD = formatArea(fullSq, scale); 
         tableHTML += `<tr class="hl-row"><td>${u.lbl_16ana}</td><td id="res_content_0"><div style="font-weight:900; color:#b71c1c; font-size:14px;">${fullD.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${fullD.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${fullD.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${fullD.kad} Sq.Kadi</span> | <span style="color:#c62828; font-weight:900;">${fullD.sq} Sq.Ft</span></div></td></tr>`;
-        fracs.forEach((f, idx) => { let area = fullSq * f.v; let d = formatArea(area, scale); let nameCell = `<div>1 ${f.n}</div><div style="margin-top:5px; display:flex; align-items:center; gap:4px;"><span style="font-weight:900; color:#00695c; font-size:11px;">x</span><input type="number" id="row_mul_${idx+1}" value="1" style="width:40px; padding:3px; text-align:center; border:2px solid #00695c; border-radius:4px; font-weight:900; font-size:12px;"><button onclick="updateRowCalc(${idx+1}, ${area})" style="background:#00695c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:10px; padding:4px 6px; font-weight:900;">OK</button></div>`; tableHTML += `<tr><td>${nameCell}</td><td id="res_content_${idx+1}"><div style="font-weight:900; color:#b71c1c; font-size:14px;">${d.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${d.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${d.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${fullD.kad} Sq.Kadi</span> | <span style="color:#c62828; font-weight:900;">${d.sq} Sq.Ft</span></div></td></tr>`; }); 
+        fracs.forEach((f, idx) => { let area = fullSq * f.v; let d = formatArea(area, scale); let nameCell = `<div>1 ${f.n}</div><div style="margin-top:5px; display:flex; align-items:center; gap:4px;"><span style="font-weight:900; color:#00695c; font-size:11px;">x</span><input type="number" id="row_mul_${idx+1}" value="1" style="width:40px; padding:3px; text-align:center; border:2px solid #00695c; border-radius:4px; font-weight:900; font-size:12px;"><button onclick="updateRowCalc(${idx+1}, ${area})" style="background:#00695c; color:#fff; border:none; border-radius:3px; cursor:pointer; font-size:10px; padding:4px 6px; font-weight:900;">OK</button></div>`; tableHTML += `<tr><td>${nameCell}</td><td id="res_content_${idx+1}"><div style="font-weight:900; color:#b71c1c; font-size:14px;">${d.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${d.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${d.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${d.kad} Sq.Kadi</span> | <span style="color:#00695c; font-weight:900;">${d.sq} Sq.Ft</span></div></td></tr>`; }); 
         document.getElementById('breakdownTable').innerHTML = tableHTML; 
     }
+
     window.updateRowCalc = function(index, baseSqFt) { let mulVal = parseFloat(document.getElementById('row_mul_'+index).value) || 0; let scale = parseFloat(document.getElementById('scaleInput').value); if(!scale || scale <= 0) return; let d = formatArea(baseSqFt * mulVal, scale); document.getElementById('res_content_'+index).innerHTML = `<div style="font-weight:900; color:#b71c1c; font-size:14px;">${d.str}</div><div style="font-size:13px; margin-bottom:3px; font-weight:700;">${d.sub}</div><div style="font-size:11px; color:#444; line-height:1.5;"><span style="color:#2e7d32; font-weight:900;">${d.acreSplit}</span><br><span style="color:#00695c; font-weight:900;">${d.kad} Sq.Kadi</span> | <span style="color:#00695c; font-weight:900;">${d.sq} Sq.Ft</span></div>`; }
+    
     function addLandRow() { 
         let div = document.createElement('div'); div.className = 'land-row'; 
-        let lang = localStorage.getItem('skr_user_lang_final') || 'def', labels = i18n[lang] || i18n.def;
+        let lang = localStorage.getItem('aero_calc_lang_lock') || 'def', labels = i18n[lang] || i18n.def;
         div.innerHTML = `<select class="lr-op"><option value="1">+</option><option value="-1">-</option></select><div class="lr-box"><span class="lr-label la-bg">${labels.bg_label}</span><input type="number" class="lr-in l-b" placeholder="0"></div><div class="lr-box"><span class="lr-label la-kt">${labels.kt_label}</span><input type="number" class="lr-in l-k" placeholder="0"></div><div class="lr-box"><span class="lr-label la-dh">${labels.dh_label}</span><input type="number" class="lr-in l-d" placeholder="0"></div><div class="lr-box-large"><span class="lr-label la-mi">${labels.la_mi}</span><div class="micro-wrap"><input type="number" class="lr-in l-m" placeholder="0" style="width:100%;"><select class="micro-sel"><option value="kanwan">${labels.opt_kw_sel}</option><option value="dhurki">${labels.opt_dk_sel}</option></select></div></div><button class="lr-del" onclick="this.parentElement.remove()">✕</button>`; 
         document.getElementById('landRowsArea').appendChild(div); 
     }
+    
     function calcLandTotal() { 
         let totalKan = 0; let scale = parseFloat(document.getElementById('scaleInput').value); if(!scale || scale <= 0) return;
         document.querySelectorAll('.land-row').forEach(r => { let op = parseInt(r.querySelector('.lr-op').value); let b = parseFloat(r.querySelector('.l-b').value) || 0, k = parseFloat(r.querySelector('.l-k').value) || 0, d = parseFloat(r.querySelector('.l-d').value) || 0, m = parseFloat(r.querySelector('.l-m').value) || 0, t = r.querySelector('.micro-sel').value; totalKan += op * ((b*6400) + (k*320) + (d*16) + (t === 'dhurki' ? m*0.8 : m)); }); 
@@ -570,8 +886,9 @@
         let htmlRes = `<div style="font-size:26px; font-weight:900; color:#b71c1c; margin-bottom:5px;">${sign}${res.str}</div><div style="font-size:18px; font-weight:900; color:#b71c1c; margin-bottom:12px;">${res.sub}</div><div style="border-top:2px solid #00796b; margin-top:10px; margin-bottom:15px;"></div><div class="grid-res" style="background:#fff; border:2px solid #bdbdbd; padding:12px; border-radius:8px;"><div><span class="res-label" id="l_dec">Decimal:</span> <span class="res-val c-dec">${res.dec}</span></div><div><span class="res-label" id="l_hec">Hectare:</span> <span class="res-val c-hec">${res.hec}</span></div><div style="grid-column: span 2;"><span class="res-label" id="l_acd">Acre-Dec:</span> <span class="res-val c-ac">${res.acreSplit}</span> <span style="font-size:11px; color:#444;">(Total: ${res.ac} Ac)</span></div><div style="border-top:1px dashed #999; padding-top:5px;"><span class="res-label" id="l_kad">Sq.Kadi:</span> <span class="res-val c-kad">${res.kad}</span></div><div style="border-top:1px dashed #999; padding-top:5px;"><span class="res-label" id="l_sqf">Sq.Ft:</span> <span class="res-val c-sq">${res.sq}</span></div><div style="border-top:1px dashed #999; padding-top:5px; grid-column: span 2;"><span class="res-label" id="l_gaj">Sq.Yard:</span> <span class="res-val" style="color:#d84315;">${res.sqy}</span></div><div style="border-top:1px dashed #999; padding-top:5px; grid-column: span 2;"><span class="res-label" id="l_sqm">Sq.Meter:</span> <span class="res-val" style="color:#004d40;">${res.sqm}</span></div></div>`;
         document.getElementById('landTotalRes').innerHTML = htmlRes; document.getElementById('landTotalRes').classList.remove('hidden'); 
     }
+    
     function updateLandAdderLabels() {
-        let lang = localStorage.getItem('skr_user_lang_final') || 'def';
+        let lang = localStorage.getItem('aero_calc_lang_lock') || 'def';
         let labels = i18n[lang] || i18n.def;
         document.querySelectorAll('.land-row').forEach(row => {
             row.querySelector('.la-bg').innerText = labels.bg_label; row.querySelector('.la-kt').innerText = labels.kt_label;
@@ -580,6 +897,354 @@
         });
     }
 
+    /* --- [८. एडवांस कच्चा-पक्का एवं रकबा मास्टर] --- */
+    function toggleAdvZamindari() { 
+        document.getElementById('advZamindariContainer').classList.toggle('hidden'); 
+    }
+    
+    function getZKanwans(prefix) {
+        let a = parseFloat(document.getElementById(prefix+'ana').value) || 0;
+        let g = parseFloat(document.getElementById(prefix+'gan').value) || 0;
+        let k = parseFloat(document.getElementById(prefix+'kau').value) || 0;
+        let kr = parseFloat(document.getElementById(prefix+'kra').value) || 0;
+        let d = parseFloat(document.getElementById(prefix+'dan').value) || 0;
+        let r = parseFloat(document.getElementById(prefix+'ren').value) || 0;
+        let p = parseFloat(document.getElementById(prefix+'par').value) || 0;
+        let kn = parseFloat(document.getElementById(prefix+'kan').value) || 0;
+        return (a * 3686400) + (g * 184320) + (k * 46080) + (kr * 15360) + (d * 5120) + (r * 256) + (p * 16) + kn;
+    }
+
+    function getZArea(prefix) {
+        let b = parseFloat(document.getElementById(prefix+'b').value) || 0;
+        let k = parseFloat(document.getElementById(prefix+'k').value) || 0;
+        let d = parseFloat(document.getElementById(prefix+'d').value) || 0;
+        let m = parseFloat(document.getElementById(prefix+'m').value) || 0; 
+        let type = document.getElementById(prefix+'type').value; 
+        let mKanwan = type === 'dhurki' ? m * 0.8 : m;
+        return (b * 6400) + (k * 320) + (d * 16) + mKanwan; 
+    }
+
+    function formatZKanwans(val) {
+        if (val <= 0) return "0 आना";
+        let rem = Math.round(val); 
+        let kn = rem % 16; rem = Math.floor(rem / 16);
+        let p = rem % 16; rem = Math.floor(rem / 16);
+        let r = rem % 20; rem = Math.floor(rem / 20);
+        let d = rem % 3; rem = Math.floor(rem / 3);
+        let kr = rem % 3; rem = Math.floor(rem / 3);
+        let k = rem % 4; rem = Math.floor(rem / 4);
+        let g = rem % 20; rem = Math.floor(rem / 20);
+        let a = rem;
+        
+        let res = [];
+        if(a > 0) res.push(a + " आना");
+        if(g > 0) res.push(g + " गंडा");
+        if(k > 0) res.push(k + " कौड़ी");
+        if(kr > 0) res.push(kr + " क्रन्त");
+        if(d > 0) res.push(d + " दन्त");
+        if(r > 0) res.push(r + " रेन");
+        if(p > 0) res.push(p + " परस");
+        if(kn > 0) res.push(kn + " कनवाँ");
+        
+        return res.join(" - ");
+    }
+
+    function formatZArea(totalKanwans) {
+        if (totalKanwans <= 0) return "0 बिघा";
+        let bigha = Math.floor(totalKanwans / 6400); let rem1 = totalKanwans % 6400;
+        let katha = Math.floor(rem1 / 320); let rem2 = rem1 % 320;
+        let dhur = Math.floor(rem2 / 16); 
+        let kanma = (rem2 % 16).toFixed(2);
+        let dhurki = ((rem2 % 16) / 0.8).toFixed(2);
+        return `<span style="color:#b71c1c;">${bigha} बिघा - ${katha} कट्ठा - ${dhur} धुर</span><br><span style="font-size:12px; color:#4a148c; font-weight:bold;">${kanma} कनवाँ [या ${dhurki} धुरकी]</span>`;
+    }
+
+    function fillInputsFromKanwans(prefix, val) {
+        if (val < 0) val = 0;
+        let rem = Math.round(val); 
+        let kn = rem % 16; rem = Math.floor(rem / 16);
+        let p = rem % 16; rem = Math.floor(rem / 16);
+        let r = rem % 20; rem = Math.floor(rem / 20);
+        let d = rem % 3; rem = Math.floor(rem / 3);
+        let kr = rem % 3; rem = Math.floor(rem / 3);
+        let k = rem % 4; rem = Math.floor(rem / 4);
+        let g = rem % 20; rem = Math.floor(rem / 20);
+        let a = rem;
+
+        document.getElementById(prefix+'ana').value = a || '';
+        document.getElementById(prefix+'gan').value = g || '';
+        document.getElementById(prefix+'kau').value = k || '';
+        document.getElementById(prefix+'kra').value = kr || '';
+        document.getElementById(prefix+'dan').value = d || '';
+        document.getElementById(prefix+'ren').value = r || '';
+        document.getElementById(prefix+'par').value = p || '';
+        document.getElementById(prefix+'kan').value = kn || '';
+    }
+
+    function fillInputsFromArea(prefix, totalKanwans) {
+        if (totalKanwans < 0) totalKanwans = 0;
+        let bigha = Math.floor(totalKanwans / 6400); let rem1 = totalKanwans % 6400;
+        let katha = Math.floor(rem1 / 320); let rem2 = rem1 % 320;
+        let dhur = Math.floor(rem2 / 16); let kanma = (rem2 % 16).toFixed(2);
+        
+        document.getElementById(prefix+'b').value = bigha || '';
+        document.getElementById(prefix+'k').value = katha || '';
+        document.getElementById(prefix+'d').value = dhur || '';
+        document.getElementById(prefix+'m').value = parseFloat(kanma) || '';
+        document.getElementById(prefix+'type').value = 'kanwan';
+    }
+
+    function calcAdvZamindari() {
+        const FULL_SHARE = 58982400; 
+        let resHTML = "";
+
+        let vArea = getZArea('z_v_'); 
+        let sShare = getZKanwans('z_s_');
+        let sArea = getZArea('z_s_');
+        let bKachhaShare = getZKanwans('z_b_'); 
+        let bPakkaInput = getZKanwans('z_p_'); 
+        let bArea = getZArea('z_b_');
+        let bPakkaShare = 0;
+
+        let changed = true;
+        let loopCount = 0;
+        while(changed && loopCount < 10) {
+            changed = false;
+            loopCount++;
+            
+            if (vArea === 0) {
+                if (sShare > 0 && sArea > 0) { vArea = (sArea * FULL_SHARE) / sShare; changed = true; }
+                else if (bPakkaInput > 0 && bArea > 0) { vArea = (bArea * FULL_SHARE) / bPakkaInput; changed = true; }
+                else if (bPakkaShare > 0 && bArea > 0) { vArea = (bArea * FULL_SHARE) / bPakkaShare; changed = true; }
+            }
+            if (sShare === 0) {
+                if (vArea > 0 && sArea > 0) { sShare = (sArea / vArea) * FULL_SHARE; changed = true; }
+                else if (bKachhaShare > 0 && (bPakkaInput > 0 || bPakkaShare > 0)) { 
+                    let pakkaToUse = bPakkaInput > 0 ? bPakkaInput : bPakkaShare;
+                    sShare = (pakkaToUse / bKachhaShare) * FULL_SHARE; changed = true; 
+                }
+            }
+            if (sArea === 0) {
+                if (vArea > 0 && sShare > 0) { sArea = (sShare / FULL_SHARE) * vArea; changed = true; }
+                else if (bKachhaShare > 0 && bArea > 0) { sArea = (bArea / bKachhaShare) * FULL_SHARE; changed = true; }
+            }
+            if (bKachhaShare === 0) {
+                if (sArea > 0 && bArea > 0) { bKachhaShare = (bArea / sArea) * FULL_SHARE; changed = true; }
+                else if (sShare > 0 && (bPakkaInput > 0 || bPakkaShare > 0)) { 
+                    let pakkaToUse = bPakkaInput > 0 ? bPakkaInput : bPakkaShare;
+                    bKachhaShare = (pakkaToUse / sShare) * FULL_SHARE; changed = true; 
+                }
+            }
+            if (bPakkaShare === 0 && bPakkaInput === 0) {
+                if (vArea > 0 && bArea > 0) { bPakkaShare = (bArea / vArea) * FULL_SHARE; changed = true; }
+                else if (sShare > 0 && bKachhaShare > 0) { bPakkaShare = (bKachhaShare * sShare) / FULL_SHARE; changed = true; }
+            } else if (bPakkaInput > 0) {
+                bPakkaShare = bPakkaInput; 
+            }
+            if (bArea === 0) {
+                if (vArea > 0 && (bPakkaInput > 0 || bPakkaShare > 0)) { 
+                    let pakkaToUse = bPakkaInput > 0 ? bPakkaInput : bPakkaShare;
+                    bArea = (pakkaToUse / FULL_SHARE) * vArea; changed = true; 
+                }
+                else if (sArea > 0 && bKachhaShare > 0) { bArea = (bKachhaShare / FULL_SHARE) * sArea; changed = true; }
+            }
+        }
+
+        if(vArea > 0 && getZArea('z_v_') === 0) fillInputsFromArea('z_v_', vArea);
+        if(sShare > 0 && getZKanwans('z_s_') === 0) fillInputsFromKanwans('z_s_', sShare);
+        if(sArea > 0 && getZArea('z_s_') === 0) fillInputsFromArea('z_s_', sArea);
+        if(bKachhaShare > 0 && getZKanwans('z_b_') === 0) fillInputsFromKanwans('z_b_', bKachhaShare);
+        if(bPakkaShare > 0 && getZKanwans('z_p_') === 0) fillInputsFromKanwans('z_p_', bPakkaShare);
+        if(bArea > 0 && getZArea('z_b_') === 0) fillInputsFromArea('z_b_', bArea);
+
+        resHTML += `<div class="zam-res-title">📊 निष्कर्ष (Final Breakdown)</div>`;
+        
+        if(vArea > 0) {
+            resHTML += `<div style="text-align:left; background:#fff; padding:15px; border-radius:10px; margin-bottom:12px; border:2px solid #ccc; box-shadow:0 4px 8px rgba(0,0,0,0.1);">
+                <div style="font-size:12px; color:#666; font-weight:bold; margin-bottom:3px;">गाँव का कुल रकबा (16 आना):</div>
+                <div style="font-size:16px; color:#000; font-weight:900;">${formatZArea(vArea)}</div>
+            </div>`;
+        }
+
+        if(sShare > 0 || sArea > 0) {
+            resHTML += `<div style="text-align:left; background:#e8eaf6; padding:15px; border-radius:10px; margin-bottom:12px; border:2px solid #3f51b5; box-shadow:0 4px 8px rgba(63,81,181,0.2);">
+                <div style="font-size:14px; color:#3f51b5; font-weight:900; margin-bottom:8px; border-bottom:1px solid #c5cae9; padding-bottom:5px;">विक्रेता का कुल हिस्सा (Seller):</div>
+                <div style="font-size:12px; color:#555; font-weight:bold; margin-top:5px;">पक्का हिस्सा:</div>
+                <div style="font-size:15px; color:#b71c1c; font-weight:900; margin-bottom:8px;">${formatZKanwans(sShare)}</div>
+                <div style="font-size:12px; color:#555; font-weight:bold;">कुल रकबा:</div>
+                <div style="font-size:16px; color:#b71c1c; font-weight:900;">${formatZArea(sArea)}</div>
+            </div>`;
+        }
+
+        if(bKachhaShare > 0 || bPakkaShare > 0 || bArea > 0) {
+            resHTML += `<div style="text-align:left; background:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:12px; border:2px solid #4caf50; box-shadow:0 4px 8px rgba(76,175,80,0.2);">
+                <div style="font-size:14px; color:#2e7d32; font-weight:900; margin-bottom:8px; border-bottom:1px solid #c8e6c9; padding-bottom:5px;">क्रेता को प्राप्त (Buyer/Transfer):</div>
+                <div style="font-size:12px; color:#555; font-weight:bold; margin-top:5px;">कच्चा हिस्सा (Seller के सापेक्ष):</div>
+                <div style="font-size:15px; color:#00695c; font-weight:900; margin-bottom:8px;">${formatZKanwans(bKachhaShare)}</div>
+                ${bPakkaShare > 0 ? `
+                <div style="font-size:12px; color:#555; font-weight:bold;">पक्का हिस्सा (गाँव के सापेक्ष):</div>
+                <div style="font-size:15px; color:#00695c; font-weight:900; margin-bottom:8px;">${formatZKanwans(bPakkaShare)}</div>
+                ` : ''}
+                <div style="font-size:12px; color:#555; font-weight:bold;">प्राप्त रकबा:</div>
+                <div style="font-size:16px; color:#00695c; font-weight:900;">${formatZArea(bArea)}</div>
+            </div>`;
+        }
+        
+        if (resHTML === `<div class="zam-res-title">📊 निष्कर्ष (Final Breakdown)</div>`) {
+            resHTML += `<div style="color:red; font-weight:bold; font-size:13px; padding:10px;">कृपया कोई डेटा दर्ज करें! (Please enter some data)</div>`;
+        }
+
+        document.getElementById('advZamRes').innerHTML = resHTML;
+        document.getElementById('advZamRes').classList.remove('hidden');
+    }
+
+    /* --- [९. A4 आधिकारिक पर्चा / रिपोर्ट जनरेटर - PERFECT A4 SETUP] --- */
+    function openA4ReportModal() {
+        document.getElementById('repDate').innerText = new Date().toLocaleDateString('hi-IN');
+        
+        let calcBody = document.getElementById('repCalcBody');
+        let scaleVal = document.getElementById('scaleInput').value || '95.0625';
+        let laggaVal = document.getElementById('laggaInput').value || '6.5';
+        
+        let resText = document.getElementById('resText').innerText;
+        let resSub = document.getElementById('resSub').innerText;
+        let decVal = document.getElementById('rDec').innerText;
+        let sqftVal = document.getElementById('rSqFt').innerText;
+        let sqyardVal = document.getElementById('rSqYard').innerText;
+        let sqkadiVal = document.getElementById('rSqKadi').innerText;
+        let sqmVal = document.getElementById('rSqMeter').innerText;
+        let acreSplit = document.getElementById('rAcreSplit').innerText;
+        let acreTotal = document.getElementById('rAcre').innerText;
+        let hecVal = document.getElementById('rHec').innerText;
+
+        let hasCalc = (resText && resText !== "");
+
+        let summaryHtml = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:#fff8e1; padding:8px 12px; border-radius:5px; border:1px solid #ffca28; margin-bottom:8px;">
+                <div><b>📏 लग्गा पैमाना:</b> ${laggaVal} हाथ (1 हाथ = 1.5 फीट)</div>
+                <div><b>⚙️ 1 धुर मान:</b> ${scaleVal} वर्ग फीट (Sq.Ft)</div>
+            </div>
+        `;
+
+        if (hasCalc) {
+            summaryHtml += `
+                <div style="text-align:center; padding:10px; background:#e8f5e9; border:1.5px solid #4caf50; border-radius:6px; margin-bottom:8px;">
+                    <div style="font-size:16.5px; font-weight:900; color:#b71c1c;">कुल संगणित रकबा: ${resText}</div>
+                    <div style="font-size:13.5px; font-weight:800; color:#4a148c; margin-top:2px;">${resSub}</div>
+                </div>
+                <table class="a4-table">
+                    <tr><th>इकाई (Unit)</th><th>मान (Calculated Value)</th><th>इकाई (Unit)</th><th>मान (Calculated Value)</th></tr>
+                    <tr><td><b>डिसमिल (Decimal)</b></td><td style="color:#2e7d32; font-weight:900;">${decVal}</td><td><b>एकड़ (Acre)</b></td><td style="color:#f57f17; font-weight:900;">${acreSplit} (${acreTotal} Ac)</td></tr>
+                    <tr><td><b>वर्ग फीट (Sq.Ft)</b></td><td style="color:#c62828; font-weight:900;">${sqftVal}</td><td><b>वर्ग कड़ी (Sq.Kadi)</b></td><td style="color:#00695c; font-weight:900;">${sqkadiVal}</td></tr>
+                    <tr><td><b>वर्ग गज (Sq.Yard)</b></td><td style="color:#d84315; font-weight:900;">${sqyardVal}</td><td><b>वर्ग मीटर (Sq.Meter)</b></td><td style="color:#004d40; font-weight:900;">${sqmVal}</td></tr>
+                    <tr><td><b>हेक्टेयर (Hectare)</b></td><td colspan="3" style="color:#6a1b9a; font-weight:900;">${hecVal}</td></tr>
+                </table>
+            `;
+        } else {
+            summaryHtml += `<p style="color:#666; font-style:italic; margin:5px 0;">(कैलकुलेटर में अभी कोई रकबा दर्ज नहीं है। आप सीधे यहाँ टाइप कर सकते हैं।)</p>`;
+        }
+        calcBody.innerHTML = summaryHtml;
+
+        // 16 Ana Breakdown Table - OPTIONAL
+        let chk16 = document.getElementById('chkShow16Ana');
+        chk16.checked = false; // Default OFF
+        toggleReport16Ana(false);
+
+        // Digital Stamp Toggle (Default ON)
+        let chkStamp = document.getElementById('chkShowStamp');
+        if(chkStamp) { chkStamp.checked = true; toggleReportStamp(true); }
+
+        // Extra details / Remarks Card
+        let landRes = document.getElementById('landTotalRes');
+        let advRes = document.getElementById('advZamRes');
+        let landAdderBody = document.getElementById('repLandAdderBody');
+        
+        let extraHtml = "";
+        if (landRes && !landRes.classList.contains('hidden') && landRes.innerHTML !== "") {
+            extraHtml += `<div style="margin-bottom:8px;"><b>➕ जमीन जोड़/घटाव परिणाम:</b><br>${landRes.innerHTML}</div>`;
+        }
+        if (advRes && !advRes.classList.contains('hidden') && advRes.innerHTML !== "") {
+            extraHtml += `<div style="margin-bottom:8px;"><b>⚖️ एडवांस जमींदारी विश्लेषण:</b><br>${advRes.innerHTML}</div>`;
+        }
+        
+        if (extraHtml !== "") {
+            landAdderBody.innerHTML = extraHtml + `<div style="margin-top:6px; border-top:1px dashed #ccc; padding-top:4px; font-size:10px; color:#555;">(यहाँ आप अपनी आवश्यकतानुसार कोई भी विशेष टिप्पणी या कैफियत जोड़ सकते हैं)</div>`;
+        }
+
+        const modal = document.getElementById('reportModal');
+        modal.style.display = 'block';
+        modal.scrollTop = 0;
+        modal.scrollLeft = 0;
+    }
+
+    function toggleReport16Ana(show) {
+        let tableCard = document.getElementById('repTableCard');
+        let tableBody = document.getElementById('repTableBody');
+        let origTable = document.getElementById('breakdownTable');
+
+        if (show && origTable && origTable.innerHTML.trim() !== "") {
+            tableCard.style.display = 'block';
+            tableBody.innerHTML = `<table class="a4-table">${origTable.innerHTML}</table>`;
+            tableBody.querySelectorAll('input, button').forEach(el => el.remove());
+        } else {
+            tableCard.style.display = 'none';
+        }
+    }
+
+    // Toggle Digital Stamp Visibility
+    function toggleReportStamp(show) {
+        let sealBox = document.getElementById('digitalSealBox');
+        if(sealBox) sealBox.style.display = show ? 'flex' : 'none';
+    }
+
+    function closeA4ReportModal() {
+        document.getElementById('reportModal').style.display = 'none';
+    }
+
+    /* Standard High-Resolution A4 Page Capture */
+    function downloadA4Document() {
+        const sheet = document.getElementById('a4Sheet');
+        const modal = document.getElementById('reportModal');
+        const actions = document.querySelector('.report-controls-bar');
+        
+        let prevScrollX = modal.scrollLeft;
+        let prevScrollY = modal.scrollTop;
+        
+        modal.scrollLeft = 0;
+        modal.scrollTop = 0;
+
+        actions.style.visibility = 'hidden';
+        showToast("⏳ उच्च गुणवत्ता A4 पर्चा तैयार हो रहा है...");
+
+        setTimeout(() => {
+            html2canvas(sheet, {
+                scale: 2.8, 
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                width: 794,
+                windowWidth: 794,
+                scrollX: 0,
+                scrollY: 0
+            }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = `AERO_Geo_Legal_Land_Report_${Date.now()}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+                actions.style.visibility = 'visible';
+                modal.scrollLeft = prevScrollX;
+                modal.scrollTop = prevScrollY;
+                showToast("✅ A4 पर्चा सफलतापूर्वक डाउनलोड हो गया!");
+            }).catch(err => {
+                actions.style.visibility = 'visible';
+                modal.scrollLeft = prevScrollX;
+                modal.scrollTop = prevScrollY;
+                alert("डाउनलोड में समस्या आई: " + err);
+            });
+        }, 150);
+    }
+
+    updateLandAdderLabels();
     initSecurity();
 </script>
 </body>
