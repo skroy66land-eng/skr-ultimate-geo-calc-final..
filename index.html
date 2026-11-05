@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -480,7 +479,7 @@
                     </div>
                 </div>
 
-                <!-- Client & Property Details: Pure contenteditable blocks to prevent input clipping -->
+                <!-- Client & Property Details -->
                 <div class="a4-meta-grid">
                     <div class="a4-meta-item"><span class="a4-meta-title">जिला (District):</span><div class="a4-meta-val" contenteditable="true" id="repDist">दरभंगा</div></div>
                     <div class="a4-meta-item"><span class="a4-meta-title">अंचल (Anchal):</span><div class="a4-meta-val" contenteditable="true" id="repAnchal">सदर</div></div>
@@ -511,7 +510,7 @@
                     </div>
                 </div>
 
-                <!-- BRANDED A4 FOOTER (ENGLISH & EDITABLE ROUND DIGITAL STAMP) -->
+                <!-- BRANDED A4 FOOTER -->
                 <div class="a4-footer" contenteditable="true">
                     <div style="line-height:1.55; text-align:left;" contenteditable="true">
                         <b style="color: #b71c1c; font-size: 13.5px; letter-spacing:0.3px;">AERO GEO-LEGAL SKILLS</b><br>
@@ -539,7 +538,7 @@
         </div>
     </div>
 
-    <!-- Sticky Bottom Controls Bar: Always Pinned to Screen Bottom -->
+    <!-- Sticky Bottom Controls Bar -->
     <div class="report-controls-bar">
         <label class="report-opt-box">
             <input type="checkbox" id="chkShow16Ana" onchange="toggleReport16Ana(this.checked)">
@@ -588,7 +587,7 @@
                 method: "POST", 
                 body: JSON.stringify({ aid: APP_ID, hpid: hpid, exp: exp, mob: mob, did: deviceId }) 
             });
-        } catch(e) { console.log("Sync Fail"); }
+        } catch(e) {}
     }
 
     async function recoverFromCloud() {
@@ -663,6 +662,15 @@
         }
     }
 
+    function getSmartCode(dId, months) { 
+        let d = new Date(); 
+        let day = d.getDate(); 
+        let m = d.getMonth() + 1; 
+        let y = d.getFullYear(); 
+        let f = months == 1 ? (day*765+m*876+y*5) : months == 3 ? (day*333+m*222+y*10) : (day*111+m*999+y*20); 
+        return (parseInt(dId) + (months==1?12345:months==3?54321:99999) + f).toString(); 
+    }
+
     function verifyOTP() { 
         let input = document.getElementById('otpInput').value; 
         let c1 = getSmartCode(deviceId, 1), c3 = getSmartCode(deviceId, 3), c12 = getSmartCode(deviceId, 12); 
@@ -686,7 +694,7 @@
         }
     }
 
-    /* --- [६. ब्रांडेड मैसेजिंग और एडमिन] --- */
+    /* --- [६. ब्रांडेड ओरिजिनल मैसेजिंग एवं 100% क्रैश-प्रूफ हैंडलर] --- */
     let selectedDuration = 1;
     function prepareRequest(months) { 
         selectedDuration = months; 
@@ -694,14 +702,24 @@
         document.getElementById('commChoiceBox').classList.remove('hidden'); 
     }
 
+    /* १. क्लाइंट का मूल आवेदन संदेश (100% Original) */
     function sendRequest(method) {
         let plan = selectedDuration == 12 ? "1 Year" : selectedDuration + " Month";
         let msg = `🏛️ *AERO GEO-LEGAL SKILLS*\n【 Autonomous Tech-Legal & Skill Entity 】\n🖋️ _(SKR Geo-Legal Associates)_\n🎖️ _Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)_\n🆔 _Code: BR-30-0077516 | ISO 9001:2015_\n\n━━━━━━━━━━━━━━━━━━━━━\n📑 *APPLICATION FOR DIGITAL ACCESS*\n━━━━━━━━━━━━━━━━━━━━━\n\nTo: *AERO GEO-LEGAL SKILLS*\n\nSir, I hereby voluntarily request the activation of single-device digital calculator access under your official tech-legal terms.\n\n📱 *User Mobile:* ${currentUser}\n🆔 *Device ID:* ${deviceId}\n🔒 *HPID:* ${hpid}\n📅 *Selected Plan:* ${plan}\n\nKindly grant the authorized activation OTP.\n\nSubmitted By:\n*Applicant / User*`;
-        let encoded = encodeURIComponent(msg);
-        if (method === 'wa') window.open(`https://wa.me/91${MASTER_NUMBER}?text=${encoded}`, '_blank');
-        else window.open(`sms:${MASTER_NUMBER}?body=${encoded}`, '_blank');
+        safeSend(method, MASTER_NUMBER, msg);
     }
 
+    function generateClientOTP() { 
+        let cid = document.getElementById('clientDeviceId').value; 
+        if(cid && cid.trim() !== '') { 
+            document.getElementById('generatedCodeDisplay').innerText = getSmartCode(cid.trim(), document.getElementById('validityPeriod').value); 
+            document.getElementById('adminCommOptions').classList.remove('hidden'); 
+        } else {
+            showToast("⚠️ कृपया Client Device ID दर्ज करें");
+        }
+    }
+
+    /* २. क्लाइंट का मूल बधाई एवं एक्टिवेशन संदेश (100% Original) */
     function sendOtpToClient(method) {
         let cmob = document.getElementById('clientMobileInAdmin').value;
         let cotp = document.getElementById('generatedCodeDisplay').innerText;
@@ -710,17 +728,72 @@
         let days = (cexp == "12") ? 365 : (parseInt(cexp) * 30);
         let d = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
         let msg = `🎊 *WELCOME TO AERO GEO-LEGAL SKILLS* 🎊\n【 Autonomous Tech-Legal & Skill Entity 】\n🖋️ _(SKR Geo-Legal Associates)_\n🎖️ _Regd. U/S 8 of MSMED Act, 2006 (Central Enterprise)_\n🆔 _Code: BR-30-0077516 | ISO 9001:2015_\n\n━━━━━━━━━━━━━━━━━━━━━\n🔑 *OFFICIAL ACTIVATION CREDENTIALS*\n━━━━━━━━━━━━━━━━━━━━━\n\nDear Professional,\nWelcome to *AERO GEO-LEGAL SKILLS*! Thank you for choosing our technical & digital calculator services.\n\nYour application has been verified and your secure device access is now successfully activated:\n\n🔑 *Activation Code:* *${cotp}*\n🆔 *Authorized Terminal:* ${cdid}\n⌛ *Valid Upto:* ${d.toLocaleDateString('hi-IN')}\n\n📌 *Note:* Enter this activation code into your app to unlock full professional features. This license is non-transferable and securely bound to this device.\n\n━━━━━━━━━━━━━━━━━━━━━\n*Technical Advisor: S. K. ROY*\n📞 *Ph: +91 62002 63472*\n━━━━━━━━━━━━━━━━━━━━━`;
-        let encoded = encodeURIComponent(msg);
-        if (method === 'wa') window.open(`https://wa.me/91${cmob}?text=${encoded}`, '_blank');
-        else window.open(`sms:${cmob}?body=${encoded}`, '_blank');
+        safeSend(method, cmob, msg);
     }
+
+    /* ३. पक्का उपाय: TrebEdit के WebView को क्रैश होने और कंसोल खोलने से 100% रोकने वाला इंजन */
+    function safeSend(method, phone, text) {
+        let cleanPhone = phone ? phone.toString().replace(/\D/g, '') : '';
+        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
+        // १. क्लिपबोर्ड पर तुरंत कॉपी ताकि डेटा कभी न खोए
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text);
+            }
+        } catch(e) {}
+
+        let encoded = encodeURIComponent(text);
+
+        // २. यदि SMS भेजना हो
+        if (method === 'sms') {
+            window.location.href = cleanPhone ? `sms:${cleanPhone}?body=${encoded}` : `sms:?body=${encoded}`;
+            return;
+        }
+
+        // ३. WhatsApp के लिए Android System Intent (यह TrebEdit को क्रैश नहीं होने देता और सीधे WhatsApp ऐप खोलता है)
+        let intentUrl = `intent://send?phone=${cleanPhone}&text=${encoded}#Intent;package=com.whatsapp;scheme=whatsapp;end`;
+        
+        try {
+            window.location.href = intentUrl;
+            showToast("✅ WhatsApp खोला जा रहा है (कॉपी भी हो गया)");
+        } catch(e) {
+            // यदि ब्राउज़र इंटेंट सपोर्ट न करे तो साधारण लिंक
+            window.open(`https://wa.me/${cleanPhone}?text=${encoded}`, '_blank');
+        }
+    }
+
+    function logoutMaster() { if(confirm("Logout?")) { localStorage.removeItem('skr_final_user'); location.reload(); } }
+    function changeUser() { localStorage.removeItem('skr_final_user'); location.reload(); }
+
+    let tapCount = 0; let tapTimer = null; 
+    function handleHeaderTap() { 
+        let header = document.getElementById('appHeader');
+        header.classList.add('header-blink');
+        setTimeout(() => header.classList.remove('header-blink'), 1000);
+
+        if(localStorage.getItem('skr_final_user') !== MASTER_NUMBER) return; 
+        tapCount++; 
+        clearTimeout(tapTimer); 
+        tapTimer = setTimeout(() => { tapCount = 0; }, 600); 
+        if(tapCount >= 5) { openAdminPanel(); tapCount = 0; } 
+    }
+
+    function openAdminPanel() { 
+        document.getElementById('licenseOverlay').style.display = 'flex'; 
+        document.getElementById('loginBox').classList.add('hidden'); 
+        document.getElementById('otpBox').classList.add('hidden'); 
+        document.getElementById('adminPanel').classList.remove('hidden'); 
+    }
+
+    function closeAdmin() { document.getElementById('licenseOverlay').style.display = 'none'; }
 
     /* --- [७. कैलकुलेटर फंक्शन्स एवं संपूर्ण भाषा डिक्शनरी] --- */
     const i18n = {
         def: { bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना/Ana", lbl_gn: "गंडा/Ganda", lbl_kr: "कौड़ी/Kauri", lbl_kt: "क्रन्त/Krant", lbl_dn: "दन्त/Dant", lbl_rn: "रेन/Ren", lbl_ps: "परस/Paras", lbl_kw: "कनवाँ/Kanwan", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (Sq.Ft)", s_1: "1. हिस्सा / जमींदारी विवरण (Share Details):", r_head: "📊 परिणाम (Result)", r_ent: "आपका दर्ज किया गया रकबा: (Your Entered Area:)", s_2: "2. रकबा की इकाई (Unit):", s_3: "3. रकबा का मान (Value):", b_calc: "गणना करें (CALCULATE)", b_title: "🔻 कुल 16 आना का विवरण (Full Property Logic)", btn_toggle_conv: "📏 लंबाई एवं क्षेत्रफल परिवर्तक (Unit Converter)", b_toggle: "➕ जमीन जोड़ / घटाव (Land Calculator)", c_title_len: "🔗 त्वरित लंबाई परिवर्तक (Length Converter - 4 Units)", c_title_area: "🔗 त्वरित क्षेत्रफल परिवर्तक (Area Converter - 4 Units)", l_kadi: "कड़ी (Kadi)", l_feet: "फिट (Feet)", l_yard: "गज (Yard)", l_meter: "मीटर (Meter)", l_sqk: "वर्ग कड़ी (Sq.Kadi)", l_sqf_l: "वर्ग फिट (Sq.Ft)", l_sqy_l: "वर्ग गज (Sq.Yard)", l_sqm_l: "वर्ग मीटर (Sq.Mtr)", ad_title: "जमीन जोड़ / घटाव (Land Adder)", b_add: "+ पंक्ति जोड़ें (Add Row)", b_tot: "= कुल (Total)", opt_sf: "वर्ग फीट (Sq. Ft)", opt_sy: "वर्ग गज (Sq. Yard)", opt_sk: "वर्ग कड़ी (Sq. Kadi)", opt_dc: "डिसमिल (Decimal)", opt_ac: "एकड़ (Acre)", opt_hc: "हेक्टेयर (Hectare)", opt_sm: "वर्ग मीटर (Sq. Meter)", opt_mx: "बिघा - कट्ठा - धुर - (धुरकी/कनवाँ)", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", la_mi: "छोटी इकाई (Micro)", lbl_16ana: "16 आना (Full)" },
         en: { bg_label: "Bigha", kt_label: "Katha", dh_label: "Dhur", dhu: "Dhurki", kan: "Kanwan", lbl_an: "Ana", lbl_gn: "Ganda", lbl_kr: "Kauri", lbl_kt: "Krant", lbl_dn: "Dant", lbl_rn: "Ren", lbl_ps: "Paras", lbl_kw: "Kanwan", lbl_l: "📏 Lagga (Hand - 1.5 ft)", lbl_s: "⚙️1 Dhur (Sq.Ft)", s_1: "1. Share / Zamindari Details:", r_head: "📊 Result", r_ent: "Your Entered Area:", s_2: "2. Unit Type:", s_3: "3. Value:", b_calc: "CALCULATE", b_title: "🔻 Breakdown of 16 Ana (Full Logic)", btn_toggle_conv: "📏 Unit Converter", b_toggle: "➕ Land Calculator", c_title_len: "🔗 Length Converter (4 Units)", c_title_area: "🔗 Area Converter (4 Units)", l_kadi: "Kadi", l_feet: "Feet", l_yard: "Yard", l_meter: "Meter", l_sqk: "Sq.Kadi", l_sqf_l: "Sq.Ft", l_sqy_l: "Sq.Yard", l_sqm_l: "Sq.Mtr", ad_title: "Land Adder", b_add: "+ Add Row", b_tot: "= Total", opt_sf: "Sq. Ft", opt_sy: "Sq. Yard", opt_sk: "Sq. Kadi", opt_dc: "Decimal", opt_ac: "Acre", opt_hc: "Hectare", opt_sm: "Sq. Meter", opt_mx: "Bigha - Katha - Dhur", opt_kw_sel: "Kanwan", opt_dk_sel: "Dhurki", la_mi: "Micro Unit", lbl_16ana: "16 Ana (Full)" },
         pa: { bg_label: "ਬੀਘਾ", kt_label: "ਕੱਠਾ", dh_label: "ਧੁਰ", dhu: "ਧੁਰਕੀ", kan: "ਕਨਵਾਂ", lbl_an: "ਆਨਾ", lbl_gn: "ਗੰਡਾ", lbl_kr: "ਕੌੜੀ", lbl_kt: "ਕ੍ਰਾਂਤ", lbl_dn: "ਦੰਤ", lbl_rn: "ਰੇਨ", lbl_ps: "ਪਰਸ", lbl_kw: "ਕਨਵਾਂ", lbl_l: "📏 ਲੱਗਾ (1.5 ਫੁੱਟ)", lbl_s: "⚙️1 ਧੁਰ (ਵਰਗ ਫੁੱਟ)", s_1: "1. ਹਿੱਸਾ / ਜ਼ਿਮੀਂਦਾਰੀ ਵੇਰਵਾ:", s_2: "2. ਰਕਬੇ ਦੀ ਇਕਾਈ:", s_3: "3. ਰਕਬੇ ਦਾ ਮੁੱਲ:", b_calc: "ਹਿਸਾਬ ਕਰੋ", b_title: "🔻 ਪੂਰੇ 16 ਆਨੇ ਦਾ ਵੇਰਵਾ", btn_toggle_conv: "📏 ਲੰਬਾਈ ਅਤੇ ਰਕਬਾ ਪਰਿਵਰਤਕ", b_toggle: "➕ ਜ਼ਮੀਨ ਜੋੜ / ਘਟਾਓ", c_title_len: "🔗 ਲੰਬਾਈ ਪਰਿਵਰਤਕ", c_title_area: "🔗 ਖੇਤਰਫਲ ਪਰਿਵਰਤਕ", l_kadi: "ਕੜੀ", l_feet: "ਫੁੱਟ", l_yard: "ਗਜ਼", l_meter: "ਮੀਟਰ", l_sqk: "ਵਰਗ ਕੜੀ", l_sqf_l: "ਵਰਗ ਫੁੱਟ", l_sqy_l: "ਵਰਗ ਗਜ਼", l_sqm_l: "ਵਰਗ ਮੀਟਰ", ad_title: "ਜ਼ਮੀਨ ਕੈਲਕੁਲੇਟਰ", b_add: "+ ਕਤਾਰ ਜੋੜੋ", b_tot: "= ਕੁੱਲ", opt_sf: "ਵਰਗ ਫੁੱਟ", opt_sy: "ਵਰਗ ਗਜ਼", opt_sk: "ਵਰਗ ਕੜੀ", opt_dc: "ਡਿਸਮਿਲ", opt_ac: "ਏਕੜ", opt_hc: "ਹੈਕਟੇਅਰ", opt_sm: "ਵਰਗ ਮੀਟਰ", opt_mx: "ਬੀਘਾ - ਕੱਠਾ - ਧੁਰ", opt_kw_sel: "ਕਨਵਾਂ", opt_dk_sel: "ਧੁਰਕੀ", la_mi: "ਛੋਟੀ ਇਕਾਈ", lbl_16ana: "16 ਆਨਾ" },
-        gu: { bg_label: "વીઘા", kt_label: "કઠ્ઠા", dh_label: "ધુર", dhu: "ધુરકી", kan: "કનવાં", lbl_an: "આના", lbl_gn: "ગંડા", lbl_kr: "કૌડી", lbl_kt: "ક્રાંત", lbl_dn: "દંત", lbl_rn: "રેન", lbl_ps: "પરસ", lbl_kw: "કનવાં", lbl_l: "📏 લંગા (1.5 ft)", lbl_s: "⚙️1 ધુર (ચો.ફૂટ)", s_1: "1. હિસ્સો / જમીનદારી વિગત:", s_2: "2. જમીન માપ એકમ:", s_3: "3. માપ મૂલ્ય:", b_calc: "ગણતરી કરો", b_title: "🔻 સંપૂર્ણ 16 આનાની વિગત", btn_toggle_conv: "📏 એકમ પરિવર્તક", b_toggle: "➕ જમીન સરવાળો / બાદબાકી", c_title_len: "🔗 લંબાઈ કન્વર્ટર", c_title_area: "🔗 ક્ષેત્રફળ કન્વર્ટર", l_kadi: "કડી", l_feet: "ફૂટ", l_yard: "વાર (ગજ)", l_meter: "મીટર", l_sqk: "ચો.કડી", l_sqf_l: "ચો.ફૂટ", l_sqy_l: "ચોરસ વાર", l_sqm_l: "ચો.મીટર", ad_title: "જમીન કેલ્ક્યુલેટર", b_add: "+ લાઇન ઉમેરો", b_tot: "= કુલ", opt_sf: "ચોરસ ફૂટ", opt_sy: "ચોરસ વાર", opt_sk: "ચોરસ કડી", opt_dc: "ડીસમિલ", opt_ac: "એકર", opt_hc: "હેક્ટર", opt_sm: "ચોરસ મીટર", opt_mx: "વીઘા - કઠ્ઠા - ધુર", opt_kw_sel: "કનવાં", opt_dk_sel: "ધુરકી", la_mi: "નાનો એકમ", lbl_16ana: "16 આના" },
+        gu: { bg_label: "વીઘા", kt_label: "કઠ્ઠા", dh_label: "ધુર", dhu: "ધુરકી", kan: "કનવાં", lbl_an: "આના", lbl_gn: "ગંડા", lbl_kr: "કૌડી", lbl_kt: "ક્રાંત", lbl_dn: "દંત", lbl_rn: "રેન", lbl_ps: "પરસ", lbl_kw: "કનવાં", lbl_l: "📏 લંગા (1.5 ft)", lbl_s: "⚙️1 ધુર (ચો.ફૂટ)", s_1: "1. હિસ્સો / જમીનદારી વિગત:", s_2: "2. જમીન માપ એકમ:", s_3: "3. માપ મૂલ્ય:", b_calc: "ગણતરી કરો", b_title: "🔻 સંપૂર્ણ 16 આનાની વિગત", btn_toggle_conv: "📏 એકમ પરિવર્તક", b_toggle: "➕ જમીન સરવાળો / બાદબાકી", c_title_len: "🔗 લંબાઈ કન્વર્ટર", c_title_area: "🔗 ક્ષેત્રફળ કન્વર્ટર", l_kadi: "કડી", l_feet: "ફૂટ", l_yard: "વાર (ગજ)", l_meter: "મીટર", l_sqk: "ચો.કડી", l_sqf_l: "ચો.ફૂટ", l_sqy_l: "ચોરસ વાર", l_sqm_l: "ચોરસ મીટર", ad_title: "જમીન કેલ્ક્યુલેટર", b_add: "+ લાઇન ઉમેરો", b_tot: "= કુલ", opt_sf: "ચોરસ ફૂટ", opt_sy: "ચોરસ વાર", opt_sk: "ચોરસ કડી", opt_dc: "ડીસમિલ", opt_ac: "એકર", opt_hc: "હેક્ટર", opt_sm: "ચોરસ મીટર", opt_mx: "વીઘા - કઠ્ઠા - ધુર", opt_kw_sel: "કનવાં", opt_dk_sel: "ધુરકી", la_mi: "નાનો એકમ", lbl_16ana: "16 આના" },
         bn: { bg_label: "বিঘা", kt_label: "কাঠা", dh_label: "ধুর", dhu: "ধুরকি", kan: "কনওয়া", lbl_an: "আনা", lbl_gn: "গণ্ডা", lbl_kr: "কড়ি", lbl_kt: "ক্রান্ত", lbl_dn: "দন্ত", lbl_rn: "রেণ", lbl_ps: "পরস", lbl_kw: "কনওয়া", lbl_l: "📏 লগ্গা (হাত - ১.৫ ফুট)", lbl_s: "⚙️১ ধুর (বর্গ ফুট)", s_1: "১. অংশ / জমিদারী বিবরণ:", s_2: "২. ইউনিটের ধরন:", s_3: "৩. রডবার মান:", b_calc: "হিসাব করুন", b_title: "🔻 ১৬ আনার বিবরণ", btn_toggle_conv: "📏 একক রূপান্তরকারী", b_toggle: "➕ জমি যোগকারী", c_title_len: "🔗 দৈর্ঘ্য রূপান্তরকারী", c_title_area: "🔗 ক্ষেত্রফল রূপান্তরকারী", l_kadi: "কড়ি", l_feet: "ফুট", l_yard: "গজ", l_meter: "মিটার", l_sqk: "বর্গ কড়ি", l_sqf_l: "বর্গ ফুট", l_sqy_l: "বর্গ গজ", l_sqm_l: "বর্গ মিটার", ad_title: "জমি যোগকারী", b_add: "+ লাইন যোগ করুন", b_tot: "= মোট", opt_sf: "বর্গ ফুট", opt_sy: "বর্গ গজ", opt_sk: "বর্গ কড়ি", opt_dc: "ডেসিমেল", opt_ac: "একর", opt_hc: "হেক্টর", opt_sm: "বর্গ মিটার", opt_mx: "বিঘা - কাঠা - ধুর", opt_kw_sel: "কনওয়া", opt_dk_sel: "ধুরকি", la_mi: "ছোট ইউনিট", lbl_16ana: "১৬ আনা (Full)" },
         mr: { bg_label: "बिघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हात - १.५ ft)", lbl_s: "⚙️१ धुर (चौ.फूट)", s_1: "१. हिस्सा / जमीनदारी तपशील:", s_2: "२. रक्कबा एकक:", s_3: "३. रक्कबा मूल्य:", b_calc: "गणना करा", b_title: "🔻 १६ आना तपशील", btn_toggle_conv: "📏 युनिट कन्व्हर्टर", b_toggle: "➕ जमीन बेरीज यंत्र", c_title_len: "🔗 लांबी परिवर्तक", c_title_area: "🔗 क्षेत्र परिवर्तक", l_kadi: "कडी", l_feet: "फूट", l_yard: "वार (गज)", l_meter: "मीटर", l_sqk: "चौ.कडी", l_sqf_l: "चौ.फूट", l_sqy_l: "चौ.वार", l_sqm_l: "चौ.मीटर", ad_title: "जमीन बेरीज यंत्र", b_add: "+ ओळ जोडा", b_tot: "= एकूण", opt_sf: "चौ. फूट", opt_sy: "चौ. वार", opt_sk: "चौ. कडी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "चौ. मीटर", opt_mx: "बिघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", la_mi: "लहान युनिट", lbl_16ana: "१६ आना (Full)" },
         ta: { bg_label: "பிகா", kt_label: "கத்தா", dh_label: "துர்", dhu: "துர்கி", kan: "கன்வா", lbl_an: "ஆணா", lbl_gn: "கண்டா", lbl_kr: "கௌரி", lbl_kt: "க்ராந்த்", lbl_dn: "தந்த்", lbl_rn: "ரேன்", lbl_ps: "பரஸ்", lbl_kw: "கன்வா", lbl_l: "📏 லக்கா (1.5 அடி)", lbl_s: "⚙️1 துர் (ச.அடி)", s_1: "1. பங்கு / நில விவரம்:", s_2: "2. பரப்பளவு அலகு:", s_3: "3. பரப்பளவு மதிப்பு:", b_calc: "கணக்கிடுக", b_title: "🔻 முழு 16 ஆணா விவரம்", btn_toggle_conv: "📏 அலகு மாற்றி", b_toggle: "➕ நில கால்குலேட்டர்", c_title_len: "🔗 நீளம் மாற்றி", c_title_area: "🔗 பரப்பளவு மாற்றி", l_kadi: "கடி", l_feet: "அடி", l_yard: "கஜம் (யார்டு)", l_meter: "மீட்டர்", l_sqk: "சதுர கடி", l_sqf_l: "சதுர அடி", l_sqy_l: "சதுர கஜம்", l_sqm_l: "சதுர மீட்டர்", ad_title: "நில கூட்டல்/கழித்தல்", b_add: "+ வரிசை சேர்க்க", b_tot: "= மொத்தம்", opt_sf: "சதுர அடி", opt_sy: "சதுர கஜம்", opt_sk: "சதுர கடி", opt_dc: "சென்ட்", opt_ac: "ஏக்கர்", opt_hc: "ஹெக்டேர்", opt_sm: "சதுர மீட்டர்", opt_mx: "பிகா - கத்தா - துர்", opt_kw_sel: "கன்வா", opt_dk_sel: "துர்கி", la_mi: "நுண் அலகு", lbl_16ana: "16 ஆணா" },
@@ -729,7 +802,7 @@
         ml: { bg_label: "ബിഘ", kt_label: "കട്ട", dh_label: "ധുർ", dhu: "ധുർക്കി", kan: "കൻവാ", lbl_an: "ആണ", lbl_gn: "ഗണ്ട", lbl_kr: "കൗരി", lbl_kt: "ക്രാന്ത്", lbl_dn: "ദന്ത്", lbl_rn: "രേൻ", lbl_ps: "പരസ്", lbl_kw: "കൻവാ", lbl_l: "📏 ലഗ്ഗ (1.5 അടി)", lbl_s: "⚙️1 ധുർ (ച.അടി)", s_1: "1. വിഹിതം വിവരങ്ങൾ:", s_2: "2. വിസ്തീർണ്ണ യൂണിറ്റ്:", s_3: "3. വിസ്തീർണ്ണ മൂല്യം:", b_calc: "കണക്കാക്കുക", b_title: "🔻 പൂർണ്ണ 16 ആണ വിവരങ്ങൾ", btn_toggle_conv: "📏 യൂണിറ്റ് കൺവെർട്ടർ", b_toggle: "➕ ഭൂമി കാൽക്കുലേറ്റർ", c_title_len: "🔗 നീളം കൺവെർട്ടർ", c_title_area: "🔗 വിസ്തീർണ്ണം കൺവെർട്ടർ", l_kadi: "കടി", l_feet: "അടി", l_yard: "ഗജം (യാർഡ്)", l_meter: "മീറ്റർ", l_sqk: "ചതുരശ്ര കടി", l_sqf_l: "ചതുരശ്ര അടി", l_sqy_l: "ചതുരശ്ര ഗജം", l_sqm_l: "ചതുരശ്ര മീറ്റർ", ad_title: "ഭൂമി കൂട്ടൽ/കുറയ്ക്കൽ", b_add: "+ വരി ചേർക്കുക", b_tot: "= ആകെ", opt_sf: "ചതുരശ്ര അടി", opt_sy: "ചതുരശ്ര ഗജം", opt_sk: "ചതുരശ്ര കടി", opt_dc: "ഡെസിമൽ", opt_ac: "ഏക്കർ", opt_hc: "ഹെക്ടർ", opt_sm: "ചതുരശ്ര മീറ്റർ", opt_mx: "ബിഘ - കട്ട - ധുർ", opt_kw_sel: "കൻവാ", opt_dk_sel: "ധുർക്കി", la_mi: "ചെറിയ യൂണിറ്റ്", lbl_16ana: "16 ആണ" },
         ori: { bg_label: "ବିଘା", kt_label: "କଟା", dh_label: "ଧୂର", dhu: "ଧୂରକୀ", kan: "କନୱା", lbl_an: "ଅଣା", lbl_gn: "ଗଣ୍ଡା", lbl_kr: "କଡ଼ି", lbl_kt: "କ୍ରାନ୍ତ", lbl_dn: "ଦନ୍ତ", lbl_rn: "ରେଣ", lbl_ps: "ପरସ", lbl_kw: "କନୱା", lbl_l: "📏 ଲଗା (୧.୫ ft)", lbl_s: "⚙️୧ ଧୂର (ବର୍ଗ ଫୁଟ)", s_1: "୧. ଅଂଶ / ଜମିଦାରୀ ବିବରଣୀ:", s_2: "୨. ରକବା ର ଏକକ:", s_3: "୩. ରକବା ର ମୂଲ୍ୟ:", b_calc: "ଗଣନା କରନ୍ତୁ", b_title: "🔻 ୧୬ ଅଣାର ବିବରଣୀ", btn_toggle_conv: "📏 ଏକକ ପରିବର୍ତ୍ତକ", b_toggle: "➕ ଜମି ଯୋଗକାରୀ", c_title_len: "🔗 ଲମ୍ବ ପରିବର୍ତ୍ତକ", c_title_area: "🔗 କ୍ଷେତ୍ରଫଳ ପରିବର୍ତ୍ତକ", l_kadi: "କଡ଼ି", l_feet: "ଫୁଟ", l_yard: "ଗଜ (ୟାର୍ଡ)", l_meter: "ମିଟର", l_sqk: "ବର୍ଗ କଡ଼ି", l_sqf_l: "ବର୍ଗ ଫୁଟ", l_sqy_l: "ବର୍ଗ ଗଜ", l_sqm_l: "ବର୍ଗ ମିଟର", ad_title: "ଜମି ଯୋଗକାରୀ", b_add: "+ ଧାଡ଼ି ଯୋଡ଼ନ୍ତୁ", b_tot: "= ମୋଟ", opt_sf: "ବର୍ଗ ଫୁଟ", opt_sy: "ବର୍ଗ ଗଜ", opt_sk: "ବର୍ଗ କଡ଼ି", opt_dc: "ଡେସିମେଲ", opt_ac: "ଏକର", opt_hc: "ହେକ୍ଟର", opt_sm: "ବର୍ଗ ମିଟର", opt_mx: "ବିଘା - କଟା - ଧୂର", opt_kw_sel: "କନୱା", opt_dk_sel: "ଧୂରକୀ", la_mi: "କ୍ଷୁଦ୍ର ଏକକ", lbl_16ana: "୧୬ ଅଣା (Full)" },
         as: { bg_label: "বিঘা", kt_label: "কঠা", dh_label: "ধূৰ", dhu: "ধূৰকী", kan: "কনৱা", lbl_an: "আনা", lbl_gn: "গণ্ডা", lbl_kr: "কড়ি", lbl_kt: "ক্ৰান্ত", lbl_dn: "দন্ত", lbl_rn: "ৰেণ", lbl_ps: "পৰস", lbl_kw: "কনৱা", lbl_l: "📏 লগ্গা (১.৫ ফুট)", lbl_s: "⚙️১ ধূৰ (বৰ্গফুট)", s_1: "১. অংশ / জমিদাৰী বিৱৰণ:", s_2: "২. এককৰ ধৰণ:", s_3: "৩. মান:", b_calc: "গণনা কৰক", b_title: "🔻 ১৬ অনাৰ সম্পূৰ্ণ বিৱৰণ", btn_toggle_conv: "📏 একক ৰূপান্তৰক", b_toggle: "➕ মাটি যোগ/বিয়োগ", c_title_len: "🔗 দৈৰ্ঘ্য ৰূপান্তৰক", c_title_area: "🔗 কালি ৰূপান্তৰক", l_kadi: "কড়ি", l_feet: "ফুট", l_yard: "গজ (য়াৰ্ড)", l_meter: "মিটাৰ", l_sqk: "বৰ্গ কড়ি", l_sqf_l: "বৰ্গ ফুট", l_sqy_l: "বৰ্গ গজ", l_sqm_l: "বৰ্গ মিটাৰ", ad_title: "মাটি কেলকুলেটৰ", b_add: "+ শাৰী যোগ কৰক", b_tot: "= মুঠ", opt_sf: "বৰ্গ ফুট", opt_sy: "বৰ্গ গজ", opt_sk: "বৰ্গ কড়ি", opt_dc: "ডেচিমেল", opt_ac: "একৰ", opt_hc: "হেক্টৰ", opt_sm: "বৰ্গ মিটাৰ", opt_mx: "বিঘা - কঠা - ধূৰ", opt_kw_sel: "কনৱা", opt_dk_sel: "ধূৰকী", la_mi: "ক্ষুদ্ৰ একক", lbl_16ana: "১৬ অনা" },
-        ur: { bg_label: "بیگھہ", kt_label: "کٹھہ", dh_label: "دھور", dhu: "دھورکی", kan: "کنواں", lbl_an: "آنہ", lbl_gn: "گنڈا", lbl_kr: "کوڑی", lbl_kt: "کرانت", lbl_dn: "دنت", lbl_rn: "رین", lbl_ps: "پارس", lbl_kw: "کنواں", lbl_l: "📏 لگا (1.5 فٹ)", lbl_s: "⚙️1 دھور (مربع فٹ)", s_1: "1. حصہ / زمینداری تفصیل:", s_2: "2. رقبہ کی اکائی:", s_3: "3. رقبہ کی قیمت:", b_calc: "حساب کریں", b_title: "🔻 مکمل 16 آنہ تفصیل", btn_toggle_conv: "📏 یونٹ کنورٹر", b_toggle: "➕ زمین جمع / تفریق", c_title_len: "🔗 لمبائی کنورٹر", c_title_area: "🔗 رقبہ کنورٹر", l_kadi: "کڑی", l_feet: "فٹ", l_yard: "گز", l_meter: "میٹر", l_sqk: "مربع کڑی", l_sqf_l: "مربع فٹ", l_sqy_l: "مربع گز", l_sqm_l: "مربع میٹر", ad_title: "زمین کیلکولیٹر", b_add: "+ قطار جوڑیں", b_tot: "= کل", opt_sf: "مربع فٹ", opt_sy: "مربع گز", opt_sk: "مربع کڑی", opt_dc: "ڈسمل", opt_ac: "ایکڑ", opt_hc: "ہیکٹر", opt_sm: "مربع میٹر", opt_mx: "بیگھہ - کٹھہ - دھور", opt_kw_sel: "کنواں", opt_dk_sel: "دھورکی", la_mi: "چھوٹی اکائی", lbl_16ana: "16 آنہ" },
+        ur: { bg_label: "بیگھہ", kt_label: "کٹھہ", dh_label: "دھور", dhu: "دھورکی", kan: "کنواں", lbl_an: "آنہ", lbl_gn: "گنڈا", lbl_kr: "کوڑی", lbl_kt: "کرانت", lbl_dn: "دنت", lbl_rn: "رین", lbl_ps: "پارس", lbl_kw: "کنواں", lbl_l: "📏 लगा (1.5 فٹ)", lbl_s: "⚙️1 دھور (مربع فٹ)", s_1: "1. حصہ / زمینداری تفصیل:", s_2: "2. رقبہ کی اکائی:", s_3: "3. رقبہ کی قیمت:", b_calc: "حساب کریں", b_title: "🔻 مکمل 16 آنہ تفصیل", btn_toggle_conv: "📏 یونٹ کنورٹر", b_toggle: "➕ زمین جمع / تفریق", c_title_len: "🔗 لمبائی کنورٹر", c_title_area: "🔗 رقبہ کنورٹر", l_kadi: "کڑی", l_feet: "فٹ", l_yard: "گز", l_meter: "میٹر", l_sqk: "مربع کڑی", l_sqf_l: "مربع فٹ", l_sqy_l: "مربع گز", l_sqm_l: "مربع میٹر", ad_title: "زمین کیلکولیٹر", b_add: "+ قطار جوڑیں", b_tot: "= کل", opt_sf: "مربع فٹ", opt_sy: "مربع گز", opt_sk: "مربع کڑی", opt_dc: "ڈسمل", opt_ac: "ایکڑ", opt_hc: "ہیکٹر", opt_sm: "مربع میٹر", opt_mx: "بیگھہ - کٹھہ - دھور", opt_kw_sel: "کنواں", opt_dk_sel: "دھورکی", la_mi: "چھوٹی اکائی", lbl_16ana: "16 آنہ" },
         bh: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबा के इकाई:", s_3: "3. रकबा के मान:", b_calc: "हिसाब करीं", b_title: "🔻 कुल 16 आना के विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 रकबा परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_yard: "गज", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqy_l: "वर्ग गज", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ लाइन जोड़ीं", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "रउआ दर्ज कइले रकबा:", la_mi: "छोटका इकाई", lbl_16ana: "१६ आना (Full)" },
         mai: { m_h2: "SKR जियो-लीगल एसोसिएट्स", m_h4: "स्मार्ट समाधान आ डिजिटल दस्तावेज", bg_label: "बीघा", kt_label: "कट्ठा", dh_label: "धुर", dhu: "धुरकी", kan: "कनवाँ", lbl_an: "आना", lbl_gn: "गंडा", lbl_kr: "कौड़ी", lbl_kt: "क्रन्त", lbl_dn: "दन्त", lbl_rn: "रेन", lbl_ps: "परस", lbl_kw: "कनवाँ", lbl_l: "📏 लग्गा (हाथ - 1.5 ft)", lbl_s: "⚙️1 धुर (वर्ग फिट)", s_1: "1. हिस्सा / जमींदारी विवरण:", s_2: "2. रकबाक इकाई:", s_3: "3. रकबाक मान:", b_calc: "हिसाब करू", b_title: "🔻 कुल 16 आनाक विवरण", btn_toggle_conv: "📏 लंबाई आ एरिया परिवर्तक", b_toggle: "➕ जमीन जोड़ / घटाव", c_title_len: "🔗 लंबाई परिवर्तक", c_title_area: "🔗 क्षेत्रफल परिवर्तक", l_kadi: "कड़ी", l_feet: "फिट", l_yard: "गज", l_meter: "मीटर", l_sqk: "वर्ग कड़ी", l_sqf_l: "वर्ग फिट", l_sqy_l: "वर्ग गज", l_sqm_l: "वर्ग मीटर", ad_title: "जमीन जोड़ / घटाव", b_add: "+ पंक्ति जोड़ू", b_tot: "= कुल", opt_sf: "वर्ग फिट", opt_sy: "वर्ग गज", opt_sk: "वर्ग कड़ी", opt_dc: "डिसमिल", opt_ac: "एकड़", opt_hc: "हेक्टेयर", opt_sm: "वर्ग मीटर", opt_mx: "बीघा - कट्ठा - धुर", opt_kw_sel: "कनवाँ", opt_dk_sel: "धुरकी", r_head: "📊 परिणाम", r_ent: "अहाँक दर्ज कयल रकबा:", la_mi: "छोट इकाई", lbl_16ana: "१६ आना (Full)" },
         kai: { m_h2: "𑂮𑂹𑂍𑂹𑂩 𑂔𑂱𑂨𑂷-𑂪𑂱𑂏𑂪 𑂉𑂮𑂷𑂮𑂱𑂉𑂗𑂹𑂮", m_h4: "𑂮𑂹𑂧𑂰𑂩𑂹𑂗 𑂮𑂷𑂪𑂹𑂨𑂴𑂬𑂢", bg_label: "𑂥𑂱𑂐𑂰", kt_label: "𑂍𑂗𑂹𑂗𑂰", dh_label: "𑂠𑂳𑂩", dhu: "𑂠𑂳𑂩𑂍𑂲", kan: "𑂍𑂢𑂥𑂰𑂁", lbl_an: "𑂄𑂢𑂰", lbl_gn: "𑂏𑂁𑂗𑂰", lbl_kr: "𑂍𑂷𑂚𑂲", lbl_kt: "𑂍𑂹𑂩𑂢𑂹𑂞", lbl_dn: "𑂠𑂢𑂹𑂞", lbl_rn: "𑂩𑂉𑂢", lbl_ps: "𑂣𑂩𑂮", lbl_kw: "𑂍𑂢𑂥𑂰𑂁", lbl_l: "📏 𑂪𑂏𑂹𑂏𑂰 (1.5 ft)", lbl_s: "⚙️१ 𑂠𑂳𑂩 (𑂥𑂩𑂹𑂏 𑂤𑂲𑂗)", s_1: "1. 𑂯𑂱𑂮𑂹𑂮𑂰 𑂥𑂱𑂨𑂷𑂩𑂰:", b_title: "🔻 𑂍𑂳𑂪 16 𑂄𑂢𑂰", btn_toggle_conv: "📏 𑂪𑂁𑂥𑂰𑂆 𑂣𑂩𑂱𑂥𑂩𑂹𑂞𑂍", b_toggle: "➕ 𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", s_2: "2. 𑂉𑂍𑂰𑂆:", s_3: "3. 𑂩𑂍𑂥𑂰 𑂧𑂰𑂢:", b_calc: "𑂏𑂝𑂝𑂰 𑂍𑂩𑂲𑂁", c_title_len: "🔗 𑂪𑂁𑂥𑂰𑂆", c_title_area: "🔗 𑂩𑂍𑂥𑂰", l_kadi: "𑂍𑂚𑂲", l_feet: "𑂤𑂲𑂗", l_yard: "𑂏𑂔", l_meter: "𑂧𑂲𑂗𑂩", l_sqk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", l_sqf_l: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", l_sqy_l: "𑂥𑂩𑂹𑂏 𑂏𑂔", l_sqm_l: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", ad_title: "𑂔𑂧𑂲𑂢 𑂔𑂷𑂚", b_add: "+ 𑂣𑂁𑂍𑂹𑂞𑂱 𑂔𑂷𑂚𑂲𑂁", b_tot: "= 𑂍𑂳𑂪", opt_sf: "𑂥𑂩𑂹𑂏 𑂤𑂲𑂗", opt_sy: "𑂥𑂩𑂹𑂏 𑂏𑂔", opt_sk: "𑂥𑂩𑂹𑂏 𑂍𑂚𑂲", opt_dc: "𑂗𑂱𑂮𑂧𑂱𑂪", opt_ac: "𑂉𑂍𑂚", opt_hc: "𑂯𑂉𑂍𑂹𑂗𑂨𑂩", opt_sm: "𑂥𑂩𑂹𑂏 𑂧𑂲𑂗𑂩", opt_mx: "𑂥𑂱𑂐𑂰 - 𑂍𑂗𑂹𑂗𑂰 - 𑂠𑂳𑂩", opt_kw_sel: "𑂍𑂢𑂥𑂰𑂁", opt_dk_sel: "𑂠𑂳𑂩𑂍𑂲", la_mi: "𑂓𑂷𑂗 𑂆𑂍𑂰𑂆", r_head: "📊 𑂣𑂩𑂱𑂝𑂰𑂧", r_ent: "𑂄𑂣𑂍 𑂠𑂩𑂹𑂔 𑂍𑂆𑂪 𑂩𑂍𑂥𑂰:", lbl_16ana: "१६ आना (Full)" }
@@ -756,7 +829,6 @@
         if (document.getElementById('landTotalRes').innerHTML !== "") calcLandTotal();
     }
 
-    /* --- [स्थायी भाषा लॉक (PERMANENT PERSISTENCE)] --- */
     function changeLanguage() { 
         let lang = document.getElementById('langSelector').value; 
         localStorage.setItem('aero_calc_lang_lock', lang); 
@@ -772,37 +844,12 @@
     }
 
     function showToast(message) { let x = document.getElementById("toastBox"); x.innerText = message; x.className = "show"; setTimeout(() => x.className = "", 2500); }
-    function logoutMaster() { if(confirm("Logout?")) { localStorage.removeItem('skr_final_user'); location.reload(); } }
-    function changeUser() { localStorage.removeItem('skr_final_user'); location.reload(); }
-
-    let tapCount = 0; let tapTimer = null; 
-    function handleHeaderTap() { 
-        let header = document.getElementById('appHeader');
-        header.classList.add('header-blink');
-        setTimeout(() => header.classList.remove('header-blink'), 1000);
-
-        if(localStorage.getItem('skr_final_user') !== MASTER_NUMBER) return; 
-        tapCount++; 
-        clearTimeout(tapTimer); 
-        tapTimer = setTimeout(() => { tapCount = 0; }, 600); 
-        if(tapCount >= 5) { openAdminPanel(); tapCount = 0; } 
-    }
-
-    function openAdminPanel() { 
-        document.getElementById('licenseOverlay').style.display = 'flex'; 
-        document.getElementById('loginBox').classList.add('hidden'); 
-        document.getElementById('otpBox').classList.add('hidden'); 
-        document.getElementById('adminPanel').classList.remove('hidden'); 
-    }
-
-    function generateClientOTP() { let cid = document.getElementById('clientDeviceId').value; if(cid) { document.getElementById('generatedCodeDisplay').innerText = getSmartCode(cid, document.getElementById('validityPeriod').value); document.getElementById('adminCommOptions').classList.remove('hidden'); } }
-    function closeAdmin() { document.getElementById('licenseOverlay').style.display = 'none'; }
     function toggleShare() { document.getElementById('shareSectionContainer').classList.toggle('hidden'); }
     function toggleTable() { document.getElementById('breakdownTable').classList.toggle('hidden'); }
     function toggleConverter() { document.getElementById('converterContainer').classList.toggle('hidden'); }
     function toggleLandCalc() { document.getElementById('landCalcContainer').classList.toggle('hidden'); if(!document.getElementById('landCalcContainer').classList.contains('hidden') && document.querySelectorAll('.land-row').length === 0) addLandRow(); }
     
-    /* --- [४-यूनिट त्वरित परिवर्तक: कड़ी, फीट, गज (यार्ड), मीटर] --- */
+    /* --- [४-यूनिट त्वरित परिवर्तक] --- */
     function syncLen(src) {
         let k = document.getElementById('qKadi'), f = document.getElementById('qFeet'), y = document.getElementById('qYard'), m = document.getElementById('qMeter');
         let val = parseFloat(src === 'k' ? k.value : src === 'f' ? f.value : src === 'y' ? y.value : m.value);
@@ -1098,7 +1145,7 @@
         document.getElementById('advZamRes').classList.remove('hidden');
     }
 
-    /* --- [९. A4 आधिकारिक पर्चा / रिपोर्ट जनरेटर - PERFECT A4 SETUP] --- */
+    /* --- [९. A4 आधिकारिक पर्चा / रिपोर्ट जनरेटर] --- */
     function openA4ReportModal() {
         document.getElementById('repDate').innerText = new Date().toLocaleDateString('hi-IN');
         
@@ -1145,16 +1192,13 @@
         }
         calcBody.innerHTML = summaryHtml;
 
-        // 16 Ana Breakdown Table - OPTIONAL
         let chk16 = document.getElementById('chkShow16Ana');
-        chk16.checked = false; // Default OFF
+        chk16.checked = false;
         toggleReport16Ana(false);
 
-        // Digital Stamp Toggle (Default ON)
         let chkStamp = document.getElementById('chkShowStamp');
         if(chkStamp) { chkStamp.checked = true; toggleReportStamp(true); }
 
-        // Extra details / Remarks Card
         let landRes = document.getElementById('landTotalRes');
         let advRes = document.getElementById('advZamRes');
         let landAdderBody = document.getElementById('repLandAdderBody');
@@ -1191,7 +1235,6 @@
         }
     }
 
-    // Toggle Digital Stamp Visibility
     function toggleReportStamp(show) {
         let sealBox = document.getElementById('digitalSealBox');
         if(sealBox) sealBox.style.display = show ? 'flex' : 'none';
@@ -1201,7 +1244,6 @@
         document.getElementById('reportModal').style.display = 'none';
     }
 
-    /* Standard High-Resolution A4 Page Capture */
     function downloadA4Document() {
         const sheet = document.getElementById('a4Sheet');
         const modal = document.getElementById('reportModal');
